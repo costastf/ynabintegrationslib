@@ -32,6 +32,7 @@ Main code for ynab
 """
 
 import logging
+from requests import Session
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -48,3 +49,33 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 LOGGER_BASENAME = '''ynab'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
+
+
+class Ynab:
+
+    def __init__(self, token):
+        self._session = self._get_authenticated_session(token)
+
+    def _get_authenticated_session(self, token):
+        session = Session()
+        # TODO implement the setting of token in session headers
+        # and validation of the token
+        return session
+
+    @property
+    def budgets(self):
+        # implement the budget retrieval by modeling budget objects from the api endpoint
+        pass
+
+    @property
+    def accounts(self):
+        # implement the account retrieval by modeling budget objects from the api endpoint
+        pass
+
+    def upload_transaction(self, transaction):
+        # implement uploading of a single transation
+        pass
+
+    def upload_transactions_bulk(self, transactions):
+        # implement uploading of multiple transations
+        pass
