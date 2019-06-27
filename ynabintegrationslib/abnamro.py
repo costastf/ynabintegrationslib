@@ -32,9 +32,11 @@ Main code for abnamro
 """
 
 import logging
+from base64 import b64decode
 from requests import Session
 from urllib3.util import parse_url
-from base64 import b64decode
+from .authenticator import AccountAthenticator
+from selenium.common.exceptions import TimeoutException
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -53,11 +55,35 @@ LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
 
 
+PAGE_TRANSITION_WAIT = 120
+AUTHENTICATION_URL = 'https://www.abnamro.nl/portalserver/my-abnamro/my-overview/overview/index.html'
+
+
+class AmroAccountAthenticator(AccountAthenticator):
+
+    def get_authenticated_session(self):
+        self._logger.info('Loading login page')
+        self._driver.get(AUTHENTICATION_URL)
+        self._logger.info('Accepting cookies')
+        try:
+            self._click_on("//*[text()='Save cookie-level']")
+        except TimeoutException:
+            self._logger.warning("Cookies window didn't pop up")
+        self._logger.info('Logging in')
+        element = self._driver.find_element_by_xpath("//*[(@label='Identification code')]")
+        element.click()
+        self._driver.find_element_by_name('accountNumber').send_keys(self.account_number)
+        self._driver.find_element_by_name('cardNumber').send_keys(self.card_number)
+        self._driver.find_element_by_name('inputElement').send_keys(self.pin_number)
+        self._driver.find_element_by_id('login-submit').click()
+        return self._get_session()
+
+
 class Transaction:
     """Models a banking transaction"""
 
     def __init__(self, data):
-        self_data = data
+        _ = data
 
 
 class AbnAmro:
@@ -73,11 +99,11 @@ class AbnAmro:
                                                         pin_number)
 
     def _get_authenticated_session(self, account_number, card_number, pin_number):
-        session = Session()
-        headers = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0)'
-                                  'Gecko/20100101 Firefox/67.0')}
-        session.headers.update(headers)
-        # TODO implement authentication
+        authenticator = AmroAccountAthenticator(account_number, card_number, pin_number, AUTHENTICATION_URL)
+        session = authenticator.get_authenticated_session()
+        authenticator.quit()
+        session.headers.update({'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:67.0)'
+                                               'Gecko/20100101 Firefox/67.0')})
         return session
 
     def get_latest_transactions(self):
@@ -91,8 +117,8 @@ class AbnAmro:
     def _get_transactions(self, date_from, date_to, from_last_download_date=False):
         url = f'{self._base_url}/mutationreporting/generations/v1'
         headers = {'Content-Type': 'application/json;charset=utf-8',
-                   'DNT': 1,
-                   'Host': 'www.abnamro.nl',
+                   'DNT': '1',
+                   'Host': self._host,
                    'Referer': f'{self._base_url}/'
                               f'portalserver/mijn-abnamro/'
                               f'zelf-regelen/download-transacties/index.html',

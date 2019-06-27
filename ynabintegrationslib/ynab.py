@@ -73,9 +73,9 @@ class Ynab:
         pass
 
     def upload_transaction(self, transaction):
-        # implement uploading of a single transation
+        # implement uploading of a single transaction
         pass
 
     def upload_transactions_bulk(self, transactions):
-        # implement uploading of multiple transations
+        # implement uploading of multiple transactions
         pass
