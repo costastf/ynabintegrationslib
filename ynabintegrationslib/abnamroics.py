@@ -32,8 +32,9 @@ Main code for abnamroics
 """
 
 import logging
-from requests import Session
 from datetime import date
+
+from requests import Session
 from urllib3.util import parse_url
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''

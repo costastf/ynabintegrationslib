@@ -33,10 +33,11 @@ Main code for abnamro
 
 import logging
 from base64 import b64decode
-from requests import Session
-from urllib3.util import parse_url
-from .authenticator import AccountAthenticator
+
 from selenium.common.exceptions import TimeoutException
+from urllib3.util import parse_url
+
+from .authenticator import AccountAthenticator
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
