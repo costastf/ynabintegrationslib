@@ -68,10 +68,6 @@ class Account:
         return self._data.get('accountNumber')
 
     @property
-    def poduct_id(self):
-        return self._data.get('productId')
-
-    @property
     def product_id(self):
         return self._data.get('productId')
 
