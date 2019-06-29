@@ -33,6 +33,7 @@ Main code for ynab
 
 import logging
 from requests import Session
+from .configuration import YNAB_BUDGET_URL
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -56,10 +57,13 @@ class Ynab:
     def __init__(self, token):
         self._session = self._get_authenticated_session(token)
 
-    def _get_authenticated_session(self, token):
+    @staticmethod
+    def _get_authenticated_session(token):
         session = Session()
-        # TODO implement the setting of token in session headers
-        # and validation of the token
+        headers = {'Authorization': 'Bearer {}'.format(token)}
+        session.headers.update(headers)
+        response = session.get(YNAB_BUDGET_URL)
+        response.raise_for_status()
         return session
 
     @property
