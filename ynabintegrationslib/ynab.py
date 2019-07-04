@@ -54,27 +54,36 @@ LOGGER.addHandler(logging.NullHandler())
 
 class Ynab:
 
-    def __init__(self, token):
+    def __init__(self, token, url='https://api.youneedabudget.com'):
+        logger_name = f'{LOGGER_BASENAME}.{self.__class__.__name__}'
+        self._logger = logging.getLogger(logger_name)
+        self._base_url = url
         self._session = self._get_authenticated_session(token)
+        self._budgets = None
 
-    @staticmethod
-    def _get_authenticated_session(token):
+    def _get_authenticated_session(self, token):
+        budget_url = f'{self._base_url}/v1/budgets'
         session = Session()
         headers = {'Authorization': 'Bearer {}'.format(token)}
         session.headers.update(headers)
-        response = session.get(YNAB_BUDGET_URL)
+        response = session.get(budget_url)
         response.raise_for_status()
         return session
 
     @property
     def budgets(self):
-        # implement the budget retrieval by modeling budget objects from the api endpoint
-        pass
+        budget_url = f'{self._base_url}/v1/budgets'
+        response = self._session.get(budget_url)
+        response.raise_for_status()
+        self._budgets = response.json().get('data').get('budgets')
+        return self._budgets
 
-    @property
-    def accounts(self):
-        # implement the account retrieval by modeling budget objects from the api endpoint
-        pass
+    def accounts(self, budget_id):
+        account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'
+        response = self._session.get(account_url)
+        response.raise_for_status()
+        print(response.json())
+        return response.json().get('data').get('accounts')
 
     def upload_transaction(self, transaction):
         # implement uploading of a single transaction

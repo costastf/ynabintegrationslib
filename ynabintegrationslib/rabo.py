@@ -77,9 +77,9 @@ class Transaction:
 
 class Service:
 
-    def __init__(self, username, password):
-        self._session = self._authenticate(username, password)
-        self._transactions = None
+    def __init__(self, username=None, password=None, csv_file=None):
+        self._session = self._authenticate(username, password) if username or password else None
+        self._transactions = csv_file
 
     def _authenticate(self, username, password):
         # session = Session()
@@ -87,10 +87,16 @@ class Service:
         # return None
         pass
 
-    def _retrieve_transactions_csv(self):
-        # TODO implement retireving csv from api
+    def _retrieve_transactions_from_api(self):
+        # TODO implement retrieving csv from api
         # csv_file = b64decode(self._retrieve_transactions_csv())
         return self._transactions
+
+    def _retrieve_transactions_from_file(self):
+        with open(self._transactions, newline='', encoding='iso-8859-1') as csv_file:
+            reader = csv.DictReader(csv_file, delimiter=',', quotechar='"')
+            transactions = [line for line in reader]
+        return[Transaction(data).serialize() for data in transactions]
 
     def get_transactions(self):
         contents = csv.reader(self._transactions, delimiter=',', quotechar='"')
