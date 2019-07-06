@@ -59,7 +59,7 @@ class Ynab:
         self._logger = logging.getLogger(logger_name)
         self._base_url = url
         self._session = self._get_authenticated_session(token)
-        self._budgets = None
+        self._budgets = self.budgets
 
     def _get_authenticated_session(self, token):
         budget_url = f'{self._base_url}/v1/budgets'
@@ -75,10 +75,16 @@ class Ynab:
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        self._budgets = response.json().get('data').get('budgets')
+        self._budgets = list(response.json().get('data').get('budgets'))
         return self._budgets
 
-    def accounts(self, budget_id):
+    def get_budget_id_by_name(self, budget_name):
+        for budget in self._budgets:
+            if budget.get('name') == budget_name:
+                return budget.get('id')
+        return None
+
+    def get_accounts_for_budget(self, budget_id):
         account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'
         response = self._session.get(account_url)
         response.raise_for_status()
