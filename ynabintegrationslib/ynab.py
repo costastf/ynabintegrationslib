@@ -59,7 +59,8 @@ class Ynab:
         self._logger = logging.getLogger(logger_name)
         self._base_url = url
         self._session = self._get_authenticated_session(token)
-        self._budgets = self.budgets
+        self._budgets = self.all_budgets
+        self._default_budget = self.default_budget
 
     def _get_authenticated_session(self, token):
         budget_url = f'{self._base_url}/v1/budgets'
@@ -71,12 +72,21 @@ class Ynab:
         return session
 
     @property
-    def budgets(self):
+    def all_budgets(self):
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
         self._budgets = list(response.json().get('data').get('budgets'))
         return self._budgets
+
+    @property
+    def default_budget(self):
+        """Get the most recently edited budget and return it as the default"""
+        last_modified = max([item.get('last_modified_on', None) for item in self._budgets])
+        for budget in self._budgets:
+            if budget.get('last_modified_on') == last_modified:
+                return budget.get('id')
+        return None
 
     def get_budget_id_by_name(self, budget_name):
         for budget in self._budgets:
@@ -88,7 +98,6 @@ class Ynab:
         account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'
         response = self._session.get(account_url)
         response.raise_for_status()
-        print(response.json())
         return response.json().get('data').get('accounts')
 
     def upload_transaction(self, transaction):
