@@ -34,6 +34,7 @@ Main code for ynab
 import logging
 from requests import Session
 from .configuration import YNAB_BUDGET_URL
+from datetime import datetime
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -82,9 +83,10 @@ class Ynab:
     @property
     def default_budget(self):
         """Get the most recently edited budget and return it as the default"""
-        last_modified = max([item.get('last_modified_on', None) for item in self._budgets])
+        last_modified = max([datetime.fromisoformat(item.get('last_modified_on', None)) for item in self._budgets])
         for budget in self._budgets:
-            if budget.get('last_modified_on') == last_modified:
+            if datetime.fromisoformat(budget.get('last_modified_on')) == last_modified:
+                self._default_budget = budget.get('id')
                 return budget.get('id')
         return None
 
