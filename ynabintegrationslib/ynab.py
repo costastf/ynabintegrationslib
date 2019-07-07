@@ -33,7 +33,6 @@ Main code for ynab
 
 import logging
 from requests import Session
-from .configuration import YNAB_BUDGET_URL
 from datetime import datetime
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
@@ -60,25 +59,25 @@ class Ynab:
         self._logger = logging.getLogger(logger_name)
         self._base_url = url
         self._session = self._get_authenticated_session(token)
-        self._budgets = self.all_budgets
+        self._budgets = self.budgets
         self._default_budget = self.default_budget
 
     def _get_authenticated_session(self, token):
         budget_url = f'{self._base_url}/v1/budgets'
         session = Session()
-        headers = {'Authorization': 'Bearer {}'.format(token)}
+        headers = {'Authorization': f'Bearer {token}'}
         session.headers.update(headers)
         response = session.get(budget_url)
         response.raise_for_status()
         return session
 
     @property
-    def all_budgets(self):
+    def budgets(self):
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        self._budgets = list(response.json().get('data').get('budgets'))
-        return self._budgets
+        budgets = list(response.json().get('data').get('budgets'))
+        return budgets
 
     @property
     def default_budget(self):
@@ -91,10 +90,8 @@ class Ynab:
         return None
 
     def get_budget_id_by_name(self, budget_name):
-        for budget in self._budgets:
-            if budget.get('name') == budget_name:
-                return budget.get('id')
-        return None
+        return next((budget.get('id') for budget in self._budgets if budget.get('name').lower() == budget_name.lower()),
+                    None)
 
     def get_accounts_for_budget(self, budget_id):
         account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'

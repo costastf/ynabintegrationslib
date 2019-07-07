@@ -30,4 +30,3 @@ Main code for configuration
    http://google.github.io/styleguide/pyguide.html
 
 """
-YNAB_BUDGET_URL = 'https://api.youneedabudget.com/v1/budgets'
