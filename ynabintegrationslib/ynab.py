@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
 # File: ynab.py
 #
@@ -45,7 +45,6 @@ __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
-
 # This is the main prefix used for logging
 LOGGER_BASENAME = '''ynab'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
@@ -76,28 +75,27 @@ class Ynab:
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        budgets = list(response.json().get('data').get('budgets'))
+        budgets = [Budget(budget) for budget in list(response.json().get('data').get('budgets'))]
         return budgets
 
     @property
     def default_budget(self):
         """Get the most recently edited budget and return it as the default"""
-        last_modified = max([datetime.fromisoformat(item.get('last_modified_on', None)) for item in self._budgets])
-        for budget in self._budgets:
-            if datetime.fromisoformat(budget.get('last_modified_on')) == last_modified:
-                self._default_budget = budget.get('id')
-                return budget.get('id')
-        return None
+        last_modified = max([datetime.fromisoformat(item.last_modified_on) for item in self._budgets])
+        return next((budget.id for budget in self._budgets
+                     if datetime.fromisoformat(budget.last_modified_on) == last_modified), None)
 
     def get_budget_id_by_name(self, budget_name):
-        return next((budget.get('id') for budget in self._budgets if budget.get('name').lower() == budget_name.lower()),
-                    None)
+        return next(
+            (budget.id for budget in self._budgets if budget.name.lower() == budget_name.lower()),
+            None)
 
     def get_accounts_for_budget(self, budget_id):
         account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'
         response = self._session.get(account_url)
         response.raise_for_status()
-        return response.json().get('data').get('accounts')
+        accounts = [Account(account) for account in list(response.json().get('data').get('accounts'))]
+        return accounts
 
     def upload_transaction(self, transaction):
         # implement uploading of a single transaction
@@ -106,3 +104,86 @@ class Ynab:
     def upload_transactions_bulk(self, transactions):
         # implement uploading of multiple transactions
         pass
+
+
+class Budget:
+
+    def __init__(self, data):
+        self._data = data
+
+    @property
+    def currency_format(self):
+        return self._data.get('currency_format')
+
+    @property
+    def date_format(self):
+        return self._data.get('date_format')
+
+    @property
+    def first_month(self):
+        return self._data.get('first_month')
+
+    @property
+    def id(self):
+        return self._data.get('id')
+
+    @property
+    def last_modified_on(self):
+        return self._data.get('last_modified_on')
+
+    @property
+    def last_month(self):
+        return self._data.get('last_month')
+
+    @property
+    def name(self):
+        return self._data.get('name')
+
+
+class Account:
+
+    def __init__(self, data):
+        self._data = data
+
+    @property
+    def balance(self):
+        return self._data.get('balance')
+
+    @property
+    def cleared_balance(self):
+        return self._data.get('cleared_balance')
+
+    @property
+    def closed(self):
+        return self._data.get('closed')
+
+    @property
+    def deleted(self):
+        return self._data.get('deleted')
+
+    @property
+    def id(self):
+        return self._data.get('id')
+
+    @property
+    def name(self):
+        return self._data.get('name')
+
+    @property
+    def note(self):
+        return self._data.get('note')
+
+    @property
+    def on_budget(self):
+        return self._data.get('on_budget')
+
+    @property
+    def transfer_payee_id(self):
+        return self._data.get('transfer_payee_id')
+
+    @property
+    def type(self):
+        return self._data.get('type')
+
+
+
