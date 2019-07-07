@@ -142,3 +142,4 @@ class AbnAmro:
                              f'found in payload: {payload}')
         decoded_text = b64decode(encoded_text)
         return [Transaction(data) for data in decoded_text.splitlines()]
+
