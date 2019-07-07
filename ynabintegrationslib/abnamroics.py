@@ -33,9 +33,12 @@ Main code for abnamroics
 
 import logging
 from datetime import date
+from datetime import datetime
 
 from requests import Session
 from urllib3.util import parse_url
+
+from .core import YnabTransaction
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -53,7 +56,7 @@ LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
 
 
-class AuthenticationFiled(Exception):
+class AuthenticationFailed(Exception):
     """The token provided is invalid or the authentication failed for some other reason."""
 
 
@@ -242,16 +245,13 @@ class Period:
                       'untilPeriod': self.period}
             response = self._credit_card._session.get(url, params=params)
             response.raise_for_status()
-            self._transactions = [Transaction(data)
+            self._transactions = [CreditCardTransaction(data)
                                   for data in response.json()]
         return self._transactions
 
 
-class Transaction:
+class CreditCardTransaction(YnabTransaction):
     """Models a credit card transaction"""
-
-    def __init__(self, data):
-        self._data = data
 
     @property
     def country_code(self):
@@ -333,6 +333,25 @@ class Transaction:
     def charge_back_allowed(self):
         return self._data.get('chargeBackAllowed')
 
+    @property
+    def amount(self):
+        return int(self.billing_amount * 100)
+
+    @property
+    def payee_name(self):
+        return self.description
+
+    @property
+    def memo(self):
+        return (f'Description: {self.description}\n'
+                f'Buyer: {self.embossing_name}\n'
+                f'Merchant Category: {self.merchant_category_description}\n'
+                f'Amount: {self.billing_amount} {self.billing_currency}')
+
+    @property
+    def date(self):
+        return datetime.strptime(self.transaction_date, '%Y-%m-%d').strftime('%Y-%m')
+
 
 class CreditCard:
     """Models a credit card account"""
@@ -386,7 +405,7 @@ class CreditCard:
                    'password': password}
         response = session.post(login_url, json=payload)
         if not response.ok:
-            raise AuthenticationFiled(response.text)
+            raise AuthenticationFailed(response.text)
         return session.cookies.get('XSRF-TOKEN')
 
     @property
@@ -410,7 +429,7 @@ class CreditCard:
                       'untilPeriod': current_month}
             response = self._session.get(url, params=params)
             response.raise_for_status()
-            self._current_transactions = [Transaction(data)
+            self._current_transactions = [CreditCardTransaction(data)
                                           for data in response.json()]
         return self._current_transactions
 
@@ -438,9 +457,12 @@ class CreditCard:
             self._account = [Account(response.json())]
         return self._account
 
-# all_accounts_url = 'https://www.icscards.nl/sec/nl/sec/allaccountsv2'
-# customer_url = 'https://www.icscards.nl/sec/nl/sec/customer'
-# account_url = 'https://www.icscards.nl/sec/nl/sec/accountv5?accountNumber=ACCOUNT_NUMBER'
-# periods_url = 'https://www.icscards.nl/sec/nl/sec/periods?accountNumber=ACCOUNT_NUMBER'
-# transactions = 'https://www.icscards.nl/sec/nl/sec/transactions?accountNumber=ACCOUNT_NUMBER&flushCache=true'
-# periods_transactions = 'https://www.icscards.nl/sec/nl/sec/transactions?accountNumber=ACCOUNT_NUMBER&flushCache=true&fromPeriod=2019-01&untilPeriod=2019-01'
+    def get_period(self, year, month):
+        return next((period for period in self.periods
+                     if period.period == f'{year}-{month.zfill(2)}'), None)
+
+    def get_transactions_for_period(self, year, month):
+        period_ = self.get_period(year, month)
+        if not period_:
+            return []
+        return period_.transactions
