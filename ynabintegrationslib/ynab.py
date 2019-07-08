@@ -75,7 +75,7 @@ class Ynab:
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        budgets = [Budget(budget) for budget in response.json().get('data').get('budgets')]
+        budgets = [Budget(self, budget) for budget in response.json().get('data').get('budgets')]
         return budgets
 
     @property
@@ -108,8 +108,13 @@ class Ynab:
 
 class Budget:
 
-    def __init__(self, data):
+    def __init__(self, ynab, data):
         self._data = data
+        self._ynab = ynab
+
+    @property
+    def accounts(self):
+        return self._ynab.get_accounts_for_budget(self.id)
 
     @property
     def currency_format(self):
