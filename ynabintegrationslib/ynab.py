@@ -56,13 +56,14 @@ class Ynab:
     def __init__(self, token, url='https://api.youneedabudget.com'):
         logger_name = f'{LOGGER_BASENAME}.{self.__class__.__name__}'
         self._logger = logging.getLogger(logger_name)
+        self._api_version = 'v1'
         self._base_url = url
         self._session = self._get_authenticated_session(token)
         self._budgets = self.budgets
         self._default_budget = self.default_budget
 
     def _get_authenticated_session(self, token):
-        budget_url = f'{self._base_url}/v1/budgets'
+        budget_url = f'{self._base_url}/{self._api_version}/budgets'
         session = Session()
         headers = {'Authorization': f'Bearer {token}'}
         session.headers.update(headers)
@@ -72,7 +73,7 @@ class Ynab:
 
     @property
     def budgets(self):
-        budget_url = f'{self._base_url}/v1/budgets'
+        budget_url = f'{self._base_url}/{self._api_version}/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
         budgets = [Budget(self, budget) for budget in response.json().get('data').get('budgets')]
@@ -91,7 +92,7 @@ class Ynab:
             None)
 
     def get_accounts_for_budget(self, budget_id):
-        account_url = f'{self._base_url}/v1/budgets/{budget_id}/accounts'
+        account_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/accounts'
         response = self._session.get(account_url)
         response.raise_for_status()
         accounts = [Account(account) for account in list(response.json().get('data').get('accounts'))]
