@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # File: ynab.py
 #
@@ -75,7 +75,7 @@ class Ynab:
         budget_url = f'{self._base_url}/v1/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        budgets = [Budget(budget) for budget in list(response.json().get('data').get('budgets'))]
+        budgets = [Budget(budget) for budget in response.json().get('data').get('budgets')]
         return budgets
 
     @property
