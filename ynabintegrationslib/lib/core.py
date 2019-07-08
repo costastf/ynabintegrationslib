@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File: authenticator.py
+# File: core.py
 #
 # Copyright 2019 Costas Tyfoxylos
 #
@@ -24,22 +24,22 @@
 #
 
 """
-Main code for authenticator
+Main code for core
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
 
 """
 
-import logging
-from base64 import b64decode
-from requests import Session
 import abc
+import logging
+
+from requests import Session
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -53,7 +53,7 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 
 # This is the main prefix used for logging
-LOGGER_BASENAME = '''authenticator'''
+LOGGER_BASENAME = '''core'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
 
@@ -61,14 +61,10 @@ LOGGER.addHandler(logging.NullHandler())
 PAGE_TRANSITION_WAIT = 120
 
 
-class AccountAthenticator(abc.ABC):
+class AccountAuthenticator(abc.ABC):
 
-    def __init__(self, account_number, card_number, pin_number, url):
+    def __init__(self):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self.account_number = account_number
-        self.card_number = card_number
-        self.pin_number = pin_number
-        self.url = url
         self._driver = self._initialize_chrome()
 
     def _initialize_chrome(self):
@@ -85,15 +81,16 @@ class AccountAthenticator(abc.ABC):
 
     def _click_on(self, xpath):
         self._logger.info('Waiting for %s', xpath)
-        WebDriverWait(self._driver, PAGE_TRANSITION_WAIT).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        WebDriverWait(self._driver,
+                      PAGE_TRANSITION_WAIT).until(EC.element_to_be_clickable((By.XPATH, xpath)))
         self._logger.info('Clicking %s', xpath)
         self._driver.find_element_by_xpath(xpath).click()
 
     @abc.abstractmethod
-    def get_authenticated_session(self):
+    def authenticate(self, *args, **kwards):
         pass
 
-    def _get_session(self):
+    def get_authenticated_session(self):
         self._logger.info('Log in successful, getting session cookies.')
         session = Session()
         self._logger.info('Transferring cookies to a requests session.')
@@ -109,3 +106,46 @@ class AccountAthenticator(abc.ABC):
     def quit(self):
         self._logger.info('Closing chrome')
         self._driver.quit()
+
+
+class YnabTransaction(abc.ABC):
+
+    def __init__(self, data):
+        self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
+        self._data = data
+
+    @abc.abstractmethod
+    def amount(self):
+        pass
+
+    @abc.abstractmethod
+    def payee_name(self):
+        pass
+
+    @abc.abstractmethod
+    def memo(self):
+        pass
+
+    @abc.abstractmethod
+    def date(self):
+        pass
+
+    def __eq__(self, other):
+        """Override the default Equals behavior"""
+        if isinstance(other, YnabTransaction):
+            return hash(frozenset(self._data.items())) == hash(frozenset(other._data.items()))
+        return NotImplemented
+
+    def __ne__(self, other):
+        """Override the default Unequal behavior"""
+        if isinstance(other, YnabTransaction):
+            return hash(frozenset(self._data.items())) != hash(frozenset(other._data.items()))
+        return NotImplemented
+
+    @property
+    def to_ynab(self):
+        return {'amount': self.amount,
+                'payee_name': self.payee_name,
+                'memo': self.memo,
+                'date': self.date}
+

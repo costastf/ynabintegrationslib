@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File: core.py
+# File: __init__.py
 #
 # Copyright 2019 Costas Tyfoxylos
 #
@@ -24,58 +24,24 @@
 #
 
 """
-Main code for core
+banks package
+
+Import all parts from banks here
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
-
 """
-
-import logging
-import abc
+from .abnamro import AbnAmroContract, AbnAmroCreditCard
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
-__date__ = '''24-06-2019'''
+__date__ = '''08-07-2019'''
 __copyright__ = '''Copyright 2019, Costas Tyfoxylos'''
-__credits__ = ["Costas Tyfoxylos"]
 __license__ = '''MIT'''
 __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
-
-# This is the main prefix used for logging
-LOGGER_BASENAME = '''core'''
-LOGGER = logging.getLogger(LOGGER_BASENAME)
-LOGGER.addHandler(logging.NullHandler())
-
-
-class YnabTransaction(abc.ABC):
-
-    def __init__(self, data):
-        self._data = data
-
-    @abc.abstractmethod
-    def amount(self):
-        pass
-
-    @abc.abstractmethod
-    def payee_name(self):
-        pass
-
-    @abc.abstractmethod
-    def memo(self):
-        pass
-
-    @abc.abstractmethod
-    def date(self):
-        pass
-
-    @property
-    def to_ynab(self):
-        return {'amount': self.amount,
-                'payee_name': self.payee_name,
-                'memo': self.memo,
-                'date': self.date}
-
+# This is to 'use' the module(s), so lint doesn't complain
+assert AbnAmroContract
+assert AbnAmroCreditCard
