@@ -36,19 +36,19 @@ from base64 import b64decode
 from datetime import datetime
 import csv
 
+from .core import YnabTransaction
 
-class Transaction:
 
-    def __init__(self, data):
-        self._data = data
-
-    @property
-    def iban(self):
-        return self._data.get('IBAN/BBAN')
+class RaboTransaction(YnabTransaction):
+    """Models a Rabobank transaction"""
 
     @property
-    def currency(self):
-        return self._data.get('Munt')
+    def payee_name(self):
+        return self._data.get('Naam tegenpartij')
+
+    @property
+    def memo(self):
+        return self._data.get('Omschrijving-1')
 
     @property
     def date(self):
@@ -61,18 +61,95 @@ class Transaction:
         return int(amount.translate({ord(char): '' for char in ',.'}))
 
     @property
-    def payee_name(self):
+    def iban(self):
+        return self._data.get('IBAN/BBAN')
+
+    @property
+    def currency(self):
+        return self._data.get('Munt')
+
+    @property
+    def bic_code(self):
+        return self._data.get('BIC')
+
+    @property
+    def sequence_number(self):
+        return self._data.get('Volgnr')
+
+    @property
+    def balance(self):
+        balance = self._data.get('Saldo na trn')
+        return int(balance.translate({ord(char): '' for char in ',.'}))
+
+    @property
+    def counter_party_account(self):
+        return self._data.get('Tegenrekening IBAN/BBAN')
+
+    @property
+    def counter_party_name(self):
         return self._data.get('Naam tegenpartij')
 
     @property
-    def memo(self):
-        return self._data.get('Omschrijving-1')
+    def final_party_name(self):
+        return self._data.get('Naam uiteindelijke partij')
 
-    def serialize(self):
-        return {"date": self.date,
-                "amount": self.amount,
-                "payee_name": self.payee_name,
-                "memo": self.memo}
+    @property
+    def initiating_party(self):
+        return self._data.get('Naam initiërende partij')
+
+    @property
+    def counter_party_bic(self):
+        return self._data.get('BIC tegenpartij')
+
+    @property
+    def code(self):
+        return self._data.get('Code')
+
+    @property
+    def batch_id(self):
+        return self._data.get('Batch ID')
+
+    @property
+    def transaction_reference(self):
+        return self._data.get('Transactiereferentie')
+
+    @property
+    def authorization_reference(self):
+        return self._data.get('Machtigingskenmerk')
+
+    @property
+    def authorization_reference(self):
+        return self._data.get('Machtigingskenmerk')
+
+    @property
+    def creditor_id(self):
+        return self._data.get('Incassant ID')
+
+    @property
+    def payment_reference(self):
+        return self._data.get('Betalingskenmerk')
+
+    @property
+    def memo_2(self):
+        return self._data.get('Omschrijving-2')
+
+    @property
+    def memo_3(self):
+        return self._data.get('Omschrijving-3')
+
+    @property
+    def return_reason(self):
+        return self._data.get('Reden retour')
+
+    @property
+    def original_amount(self):
+        return self._data.get('Oorspr bedrag')
+
+    def original_currency(self):
+        return self._data.get('Oorspr munt')
+
+    def koers(self):
+        return self._data.get('Koers')
 
 
 class Service:
@@ -96,11 +173,11 @@ class Service:
         with open(self._transactions, newline='', encoding='iso-8859-1') as csv_file:
             reader = csv.DictReader(csv_file, delimiter=',', quotechar='"')
             transactions = [line for line in reader]
-        return[Transaction(data).serialize() for data in transactions]
+        return[RaboTransaction(data) for data in transactions]
 
     def get_transactions(self):
         contents = csv.reader(self._transactions, delimiter=',', quotechar='"')
         transactions = [line for line in contents]
         transactions.pop(0)  # getting rid of header line in index 0
-        return [Transaction(data) for data in transactions]
+        return [RaboTransaction(data) for data in transactions]
 
