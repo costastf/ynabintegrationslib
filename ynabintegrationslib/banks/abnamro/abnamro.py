@@ -263,3 +263,25 @@ class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
         response.raise_for_status()
         return [AbnAmroAccountTransaction(data.get('mutation'))
                 for data in response.json().get('mutationsList', {}).get('mutations')]
+
+    @property
+    def transactions(self):
+        transactions, last_mutation_key = self._get_transactions()
+        for transaction in transactions:
+            yield transaction
+        while last_mutation_key:
+            params = {'lastMutationKey': last_mutation_key}
+            transactions, last_mutation_key = self._get_transactions(params=params)
+            for transaction in transactions:
+                yield transaction
+
+    def _get_transactions(self, params=None):
+        url = f'{self._base_url}/mutations/{self.iban_number}'
+        headers = {'x-aab-serviceversion': 'v3'}
+        response = self._session.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        mutations_list = response.json().get('mutationsList', {})
+        last_mutation_key = mutations_list.get('lastMutationKey', None)
+        transactions = [AbnAmroAccountTransaction(data.get('mutation'))
+                        for data in mutations_list.get('mutations')]
+        return transactions, last_mutation_key
