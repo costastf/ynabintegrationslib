@@ -262,7 +262,7 @@ class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
         response = self._session.get(url, headers=headers)
         response.raise_for_status()
         return [AbnAmroAccountTransaction(data.get('mutation'))
-                for data in response.json().get('mutationsList', {}).get('mutations')]
+                for data in response.json().get('mutationsList', {}).get('mutations', [])]
 
     @property
     def transactions(self):
