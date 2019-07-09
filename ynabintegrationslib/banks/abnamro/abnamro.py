@@ -59,7 +59,7 @@ LOGGER.addHandler(logging.NullHandler())
 
 class AbnAmroAccountAuthenticator(AccountAuthenticator):
 
-    def authenticate(self,
+    def authenticate(self,  # pylint: disable=arguments-differ
                      account_number,
                      card_number,
                      pin_number,
@@ -107,7 +107,7 @@ class Contract:
         return self._data.get('parentContract')
 
 
-class AbnAmroAccountTransaction(YnabTransaction):
+class AbnAmroAccountTransaction(YnabTransaction):  # pylint: disable=too-many-public-methods
     """Models a banking transaction"""
 
     @property
@@ -117,10 +117,6 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def description(self):
         return ' '.join([line.strip() for line in self._data.get('descriptionLines', [])])
-
-    @property
-    def mutation_code(self):
-        return self._data.get('mutationCode')
 
     @staticmethod
     def _timestamp_to_date(timestamp):
@@ -137,10 +133,6 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def book_date(self):
         return self._timestamp_to_date(self._data.get('bookDate'))
-
-    @property
-    def balance_after_mutation(self):
-        return self._data.get('balanceAfterMutation')
 
     @property
     def balance_after_mutation(self):
@@ -207,7 +199,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
         return self.transaction_date.strftime('%Y-%m-%d')
 
 
-class AbnAmroContract:
+class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
     """Models the service"""
 
     def __init__(self, account_number, card_number, pin_number, url='https://www.abnamro.nl'):

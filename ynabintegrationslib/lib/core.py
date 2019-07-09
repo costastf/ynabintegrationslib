@@ -87,7 +87,7 @@ class AccountAuthenticator(abc.ABC):
         self._driver.find_element_by_xpath(xpath).click()
 
     @abc.abstractmethod
-    def authenticate(self, *args, **kwards):
+    def authenticate(self, *args, **kwargs):
         pass
 
     def get_authenticated_session(self):
@@ -133,13 +133,13 @@ class YnabTransaction(abc.ABC):
     def __eq__(self, other):
         """Override the default Equals behavior"""
         if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) == hash(frozenset(other._data.items()))
+            return hash(frozenset(self._data.items())) == hash(frozenset(other._data.items()))  # pylint: disable=protected-access
         return NotImplemented
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
         if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) != hash(frozenset(other._data.items()))
+            return hash(frozenset(self._data.items())) != hash(frozenset(other._data.items()))  # pylint: disable=protected-access
         return NotImplemented
 
     @property
@@ -148,4 +148,3 @@ class YnabTransaction(abc.ABC):
                 'payee_name': self.payee_name,
                 'memo': self.memo,
                 'date': self.date}
-
