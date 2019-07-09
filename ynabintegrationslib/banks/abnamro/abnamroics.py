@@ -33,12 +33,11 @@ Main code for abnamroics
 
 import logging
 from datetime import date
-from datetime import datetime
 
 from requests import Session
 from urllib3.util import parse_url
 
-from .core import YnabTransaction
+from ynabintegrationslib.lib.core import YnabTransaction
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -60,7 +59,7 @@ class AuthenticationFailed(Exception):
     """The token provided is invalid or the authentication failed for some other reason."""
 
 
-class Account:
+class Account:  # pylint: disable=too-many-public-methods
     """Models a credit card account"""
 
     def __init__(self, data):
@@ -69,10 +68,6 @@ class Account:
     @property
     def number(self):
         return self._data.get('accountNumber')
-
-    @property
-    def poduct_id(self):
-        return self._data.get('productId')
 
     @property
     def product_id(self):
@@ -187,10 +182,6 @@ class Account:
         return self._data.get('mainCardHolder')
 
     @property
-    def main_card_holder(self):
-        return self._data.get('mainCardHolder')
-
-    @property
     def app_enrolled(self):
         return self._data.get('appEnrolled')
 
@@ -238,19 +229,19 @@ class Period:
     @property
     def transactions(self):
         if self._transactions is None:
-            url = f'{self._credit_card._base_url}/sec/nl/sec/transactions'
+            url = f'{self._credit_card._base_url}/sec/nl/sec/transactions'  # pylint: disable=protected-access
             params = {'accountNumber': self._credit_card.account_number,
                       'flushCache': True,
                       'fromPeriod': self.period,
                       'untilPeriod': self.period}
-            response = self._credit_card._session.get(url, params=params)
+            response = self._credit_card._session.get(url, params=params)  # pylint: disable=protected-access
             response.raise_for_status()
-            self._transactions = [CreditCardTransaction(data)
+            self._transactions = [AbnAmroCreditCardTransaction(data)
                                   for data in response.json()]
         return self._transactions
 
 
-class CreditCardTransaction(YnabTransaction):
+class AbnAmroCreditCardTransaction(YnabTransaction):  # pylint: disable=too-many-public-methods
     """Models a credit card transaction"""
 
     @property
@@ -350,15 +341,14 @@ class CreditCardTransaction(YnabTransaction):
 
     @property
     def date(self):
-        return datetime.strptime(self.transaction_date, '%Y-%m-%d').strftime('%Y-%m')
+        return self.transaction_date
 
 
-class CreditCard:
+class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
     """Models a credit card account"""
 
     def __init__(self, username, password, url='https://www.icscards.nl'):
-        logger_name = f'{LOGGER_BASENAME}.{self.__class__.__name__}'
-        self._logger = logging.getLogger(logger_name)
+        self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self._username = username
         self._password = password
         self._base_url = url
@@ -377,9 +367,7 @@ class CreditCard:
         session.headers.update({'X-XSRF-TOKEN': self._get_xsrf_token(session,
                                                                      self._username,
                                                                      self._password)})
-        # self._monkey_patch_requests()
-        # def _monkey_patch_requests(self):
-        self.original_get = session.get  # pylint: disable=attribute-defined-outside-init
+        self.original_get = session.get
         session.get = self._patched_get
         return session
 
@@ -419,7 +407,7 @@ class CreditCard:
         return self._account_number
 
     @property
-    def current_period_transactions(self):
+    def get_current_period_transactions(self):
         if self._current_transactions is None:
             current_month = date.today().strftime('%Y-%m')
             url = f'{self._base_url}/sec/nl/sec/transactions'
@@ -429,7 +417,7 @@ class CreditCard:
                       'untilPeriod': current_month}
             response = self._session.get(url, params=params)
             response.raise_for_status()
-            self._current_transactions = [CreditCardTransaction(data)
+            self._current_transactions = [AbnAmroCreditCardTransaction(data)
                                           for data in response.json()]
         return self._current_transactions
 
@@ -466,3 +454,9 @@ class CreditCard:
         if not period_:
             return []
         return period_.transactions
+
+    @property
+    def transactions(self):
+        for period in self.periods:
+            for transaction in period.transactions:
+                yield transaction
