@@ -33,6 +33,7 @@ Main code for core
 
 import abc
 import logging
+import json
 
 from requests import Session
 from selenium import webdriver
@@ -131,17 +132,21 @@ class YnabTransaction(abc.ABC):
     def date(self):
         pass
 
+    @property
+    def hash(self):
+        return hash(json.dumps(self._data))
+
     def __eq__(self, other):
         """Override the default Equals behavior"""
-        if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) == hash(frozenset(other._data.items()))  # pylint: disable=protected-access
-        return NotImplemented
+        if not isinstance(other, YnabTransaction):
+            raise ValueError('Not a YnabTransaction object')
+        return self.hash == other.hash
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
         if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) != hash(frozenset(other._data.items()))  # pylint: disable=protected-access
-        return NotImplemented
+            raise ValueError('Not a YnabTransaction object')
+            return self.hash != other.hash
 
     @property
     def to_ynab(self):

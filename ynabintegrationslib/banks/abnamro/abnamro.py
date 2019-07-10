@@ -221,11 +221,11 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
             if not contract:
                 raise ValueError
             self._iban_number = contract.account_number
-        return  self._iban_number
+        return self._iban_number
 
     @property
     def contracts(self):
-        if self._contracts in None:
+        if self._contracts is None:
             url = f'{self._base_url}/contracts'
             params = {'productGroups': 'PAYMENT_ACCOUNTS'}
             headers = {'x-aab-serviceversion': 'v2'}
