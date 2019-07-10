@@ -37,7 +37,7 @@ from datetime import date
 from requests import Session
 from urllib3.util import parse_url
 
-from ynabintegrationslib.lib.core import YnabTransaction
+from ynabintegrationslib.lib.core import YnabTransaction, Account
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -344,7 +344,7 @@ class AbnAmroCreditCardTransaction(YnabTransaction):  # pylint: disable=too-many
         return self.transaction_date
 
 
-class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
+class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attributes
     """Models a credit card account"""
 
     def __init__(self, username, password, url='https://www.icscards.nl'):
@@ -460,3 +460,6 @@ class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
         for period in self.periods:
             for transaction in period.transactions:
                 yield transaction
+
+    def get_current_transactions(self):
+        return self.get_current_period_transactions()

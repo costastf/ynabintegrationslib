@@ -38,7 +38,7 @@ from time import sleep
 from selenium.common.exceptions import TimeoutException
 from urllib3.util import parse_url
 
-from ynabintegrationslib.lib.core import YnabTransaction, AccountAuthenticator
+from ynabintegrationslib.lib.core import YnabTransaction, AccountAuthenticator, Account
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -199,7 +199,7 @@ class AbnAmroAccountTransaction(YnabTransaction):  # pylint: disable=too-many-pu
         return self.transaction_date.strftime('%Y-%m-%d')
 
 
-class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
+class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
     """Models the service"""
 
     def __init__(self, account_number, card_number, pin_number, url='https://www.abnamro.nl'):
@@ -264,6 +264,17 @@ class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
         return [AbnAmroAccountTransaction(data.get('mutation'))
                 for data in response.json().get('mutationsList', {}).get('mutations', [])]
 
+    def _get_transactions(self, params=None):
+        url = f'{self._base_url}/mutations/{self.iban_number}'
+        headers = {'x-aab-serviceversion': 'v3'}
+        response = self._session.get(url, headers=headers, params=params)
+        response.raise_for_status()
+        mutations_list = response.json().get('mutationsList', {})
+        last_mutation_key = mutations_list.get('lastMutationKey', None)
+        transactions = [AbnAmroAccountTransaction(data.get('mutation'))
+                        for data in mutations_list.get('mutations')]
+        return transactions, last_mutation_key
+
     @property
     def transactions(self):
         transactions, last_mutation_key = self._get_transactions()
@@ -275,13 +286,5 @@ class AbnAmroContract:  # pylint: disable=too-many-instance-attributes
             for transaction in transactions:
                 yield transaction
 
-    def _get_transactions(self, params=None):
-        url = f'{self._base_url}/mutations/{self.iban_number}'
-        headers = {'x-aab-serviceversion': 'v3'}
-        response = self._session.get(url, headers=headers, params=params)
-        response.raise_for_status()
-        mutations_list = response.json().get('mutationsList', {})
-        last_mutation_key = mutations_list.get('lastMutationKey', None)
-        transactions = [AbnAmroAccountTransaction(data.get('mutation'))
-                        for data in mutations_list.get('mutations')]
-        return transactions, last_mutation_key
+    def get_current_transactions(self):
+        return self.get_latest_transactions()

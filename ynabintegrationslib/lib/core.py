@@ -101,6 +101,7 @@ class AccountAuthenticator(abc.ABC):
                 except KeyError:
                     pass
             session.cookies.set(**cookie)
+        self.quit()
         return session
 
     def quit(self):
@@ -148,3 +149,14 @@ class YnabTransaction(abc.ABC):
                 'payee_name': self.payee_name,
                 'memo': self.memo,
                 'date': self.date}
+
+
+class Account(abc.ABC):
+
+    @abc.abstractmethod
+    def transactions(self):
+        pass
+
+    @abc.abstractmethod
+    def get_current_transactions(self):
+        pass
