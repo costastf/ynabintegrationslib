@@ -66,3 +66,12 @@ class Service:
             raise ValueError('Object not of type Account')
         if account not in self._accounts:
             self._accounts.append(account)
+
+    def get_latest_transactions(self):
+        transactions = []
+        for account in self._accounts:
+            for transaction in account.get_current_transactions():
+                if transaction not in self._transactions:
+                    self._transactions.append(transaction)
+                    transactions.append(transaction)
+        return transactions
