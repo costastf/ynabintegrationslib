@@ -259,14 +259,6 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
             response = self.original_get(*args, **kwargs)
         return response
 
-    def get_latest_transactions(self):
-        url = f'{self._base_url}/mutations/{self.iban_number}'
-        headers = {'x-aab-serviceversion': 'v3'}
-        response = self._session.get(url, headers=headers)
-        response.raise_for_status()
-        return [AbnAmroAccountTransaction(data.get('mutation'))
-                for data in response.json().get('mutationsList', {}).get('mutations', [])]
-
     def _get_transactions(self, params=None):
         url = f'{self._base_url}/mutations/{self.iban_number}'
         headers = {'x-aab-serviceversion': 'v3'}
@@ -290,4 +282,9 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
                 yield transaction
 
     def get_current_transactions(self):
-        return self.get_latest_transactions()
+        url = f'{self._base_url}/mutations/{self.iban_number}'
+        headers = {'x-aab-serviceversion': 'v3'}
+        response = self._session.get(url, headers=headers)
+        response.raise_for_status()
+        return [AbnAmroAccountTransaction(data.get('mutation'))
+                for data in response.json().get('mutationsList', {}).get('mutations', [])]

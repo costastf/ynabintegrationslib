@@ -33,7 +33,6 @@ Main code for core
 
 import abc
 import logging
-import json
 
 from requests import Session
 from selenium import webdriver
@@ -132,21 +131,20 @@ class YnabTransaction(abc.ABC):
     def date(self):
         pass
 
-    @property
-    def hash(self):
-        return hash(json.dumps(self._data))
+    def __hash__(self):
+        return hash(str(self.__dict__))
 
     def __eq__(self, other):
         """Override the default Equals behavior"""
         if not isinstance(other, YnabTransaction):
             raise ValueError('Not a YnabTransaction object')
-        return self.hash == other.hash
+        return hash(self) == hash(other)
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
-        if isinstance(other, YnabTransaction):
+        if not isinstance(other, YnabTransaction):
             raise ValueError('Not a YnabTransaction object')
-            return self.hash != other.hash
+        return hash(self) != hash(other)
 
     @property
     def to_ynab(self):
@@ -165,3 +163,18 @@ class Account(abc.ABC):
     @abc.abstractmethod
     def get_current_transactions(self):
         pass
+
+    def __hash__(self):
+        return hash(str(self.__dict__))
+
+    def __eq__(self, other):
+        """Override the default Equals behavior"""
+        if not isinstance(other, Account):
+            raise ValueError('Not a Account object')
+        return hash(self) == hash(other)
+
+    def __ne__(self, other):
+        """Override the default Unequal behavior"""
+        if not isinstance(other, Account):
+            raise ValueError('Not a Account object')
+        return hash(self) != hash(other)

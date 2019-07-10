@@ -405,18 +405,6 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
             self._account_number = response.json()[0].get('accountNumber')
         return self._account_number
 
-    def get_current_period_transactions(self):
-        current_month = date.today().strftime('%Y-%m')
-        url = f'{self._base_url}/sec/nl/sec/transactions'
-        params = {'accountNumber': self.account_number,
-                  'flushCache': True,
-                  'fromPeriod': current_month,
-                  'untilPeriod': current_month}
-        response = self._session.get(url, params=params)
-        response.raise_for_status()
-        return [AbnAmroCreditCardTransaction(data)
-                for data in response.json()]
-
     @property
     def periods(self):
         if self._periods is None:
@@ -455,4 +443,13 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
                 yield transaction
 
     def get_current_transactions(self):
-        return self.get_current_period_transactions()
+        current_month = date.today().strftime('%Y-%m')
+        url = f'{self._base_url}/sec/nl/sec/transactions'
+        params = {'accountNumber': self.account_number,
+                  'flushCache': True,
+                  'fromPeriod': current_month,
+                  'untilPeriod': current_month}
+        response = self._session.get(url, params=params)
+        response.raise_for_status()
+        return [AbnAmroCreditCardTransaction(data)
+                for data in response.json()]
