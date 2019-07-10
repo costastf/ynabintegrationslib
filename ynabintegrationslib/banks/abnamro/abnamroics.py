@@ -406,7 +406,6 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
             self._account_number = response.json()[0].get('accountNumber')
         return self._account_number
 
-    @property
     def get_current_period_transactions(self):
         if self._current_transactions is None:
             current_month = date.today().strftime('%Y-%m')
