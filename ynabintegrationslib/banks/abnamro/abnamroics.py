@@ -357,7 +357,6 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
         self._account_number = None
         self._periods = None
         self._account = None
-        self._current_transactions = None
 
     def _get_authenticated_session(self):
         session = Session()
@@ -407,21 +406,16 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
         return self._account_number
 
     def get_current_period_transactions(self):
-        if self._current_transactions is None:
-            current_month = date.today().strftime('%Y-%m')
-            url = f'{self._base_url}/sec/nl/sec/transactions'
-            params = {'accountNumber': self.account_number,
-                      'flushCache': True,
-                      'fromPeriod': current_month,
-                      'untilPeriod': current_month}
-            response = self._session.get(url, params=params)
-            response.raise_for_status()
-            self._current_transactions = [AbnAmroCreditCardTransaction(data)
-                                          for data in response.json()]
-        return self._current_transactions
-
-    def reset(self):
-        self._current_transactions = None
+        current_month = date.today().strftime('%Y-%m')
+        url = f'{self._base_url}/sec/nl/sec/transactions'
+        params = {'accountNumber': self.account_number,
+                  'flushCache': True,
+                  'fromPeriod': current_month,
+                  'untilPeriod': current_month}
+        response = self._session.get(url, params=params)
+        response.raise_for_status()
+        return [AbnAmroCreditCardTransaction(data)
+                for data in response.json()]
 
     @property
     def periods(self):

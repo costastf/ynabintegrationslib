@@ -207,6 +207,7 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
         self.account_number = account_number
         self.card_number = card_number
         self.pin_number = pin_number
+        self._contracts = None
         self._base_url = url
         self._iban_number = None
         self._host = parse_url(url).host
@@ -224,12 +225,14 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
 
     @property
     def contracts(self):
-        url = f'{self._base_url}/contracts'
-        params = {'productGroups': 'PAYMENT_ACCOUNTS'}
-        headers = {'x-aab-serviceversion': 'v2'}
-        response = self._session.get(url, params=params, headers=headers)
-        response.raise_for_status()
-        return [Contract(data) for data in response.json().get('contractList', [])]
+        if self._contracts in None:
+            url = f'{self._base_url}/contracts'
+            params = {'productGroups': 'PAYMENT_ACCOUNTS'}
+            headers = {'x-aab-serviceversion': 'v2'}
+            response = self._session.get(url, params=params, headers=headers)
+            response.raise_for_status()
+        self._contracts = [Contract(data) for data in response.json().get('contractList', [])]
+        return self._contracts
 
     def _get_authenticated_session(self):
         authenticator = AbnAmroAccountAuthenticator()
