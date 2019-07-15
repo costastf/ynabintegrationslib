@@ -132,7 +132,7 @@ class YnabTransaction(abc.ABC):
         pass
 
     def __hash__(self):
-        return hash(str(self.__dict__))
+        return hash(str(self._data))
 
     def __eq__(self, other):
         """Override the default Equals behavior"""
@@ -145,6 +145,10 @@ class YnabTransaction(abc.ABC):
         if not isinstance(other, YnabTransaction):
             raise ValueError('Not a YnabTransaction object')
         return hash(self) != hash(other)
+
+    @staticmethod
+    def _clean_up(string):
+        return " ".join(string.split())
 
     @property
     def to_ynab(self):

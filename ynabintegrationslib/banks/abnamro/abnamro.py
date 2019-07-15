@@ -116,7 +116,7 @@ class AbnAmroAccountTransaction(YnabTransaction):  # pylint: disable=too-many-pu
 
     @property
     def description(self):
-        return ' '.join([line.strip() for line in self._data.get('descriptionLines', [])])
+        return ' '.join([self._clean_up(line.strip()) for line in self._data.get('descriptionLines', [])])
 
     @staticmethod
     def _timestamp_to_date(timestamp):
@@ -188,7 +188,7 @@ class AbnAmroAccountTransaction(YnabTransaction):  # pylint: disable=too-many-pu
 
     @property
     def payee_name(self):
-        return self.counter_account_name
+        return self._clean_up(self.counter_account_name)
 
     @property
     def memo(self):

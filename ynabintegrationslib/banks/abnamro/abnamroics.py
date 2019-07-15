@@ -258,7 +258,7 @@ class AbnAmroCreditCardTransaction(YnabTransaction):  # pylint: disable=too-many
 
     @property
     def description(self):
-        return self._data.get('description')
+        return self._clean_up(self._data.get('description'))
 
     @property
     def billing_amount(self):
@@ -443,12 +443,9 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
                 yield transaction
 
     def get_current_transactions(self):
-        current_month = date.today().strftime('%Y-%m')
         url = f'{self._base_url}/sec/nl/sec/transactions'
         params = {'accountNumber': self.account_number,
-                  'flushCache': True,
-                  'fromPeriod': current_month,
-                  'untilPeriod': current_month}
+                  'flushCache': True}
         response = self._session.get(url, params=params)
         response.raise_for_status()
         return [AbnAmroCreditCardTransaction(data)
