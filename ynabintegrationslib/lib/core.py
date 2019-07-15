@@ -101,6 +101,7 @@ class AccountAuthenticator(abc.ABC):
                 except KeyError:
                     pass
             session.cookies.set(**cookie)
+        self.quit()
         return session
 
     def quit(self):
@@ -130,17 +131,20 @@ class YnabTransaction(abc.ABC):
     def date(self):
         pass
 
+    def __hash__(self):
+        return hash(str(self.__dict__))
+
     def __eq__(self, other):
         """Override the default Equals behavior"""
-        if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) == hash(frozenset(other._data.items()))  # pylint: disable=protected-access
-        return NotImplemented
+        if not isinstance(other, YnabTransaction):
+            raise ValueError('Not a YnabTransaction object')
+        return hash(self) == hash(other)
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
-        if isinstance(other, YnabTransaction):
-            return hash(frozenset(self._data.items())) != hash(frozenset(other._data.items()))  # pylint: disable=protected-access
-        return NotImplemented
+        if not isinstance(other, YnabTransaction):
+            raise ValueError('Not a YnabTransaction object')
+        return hash(self) != hash(other)
 
     @property
     def to_ynab(self):
@@ -148,3 +152,29 @@ class YnabTransaction(abc.ABC):
                 'payee_name': self.payee_name,
                 'memo': self.memo,
                 'date': self.date}
+
+
+class Account(abc.ABC):
+
+    @abc.abstractmethod
+    def transactions(self):
+        pass
+
+    @abc.abstractmethod
+    def get_current_transactions(self):
+        pass
+
+    def __hash__(self):
+        return hash(str(self.__dict__))
+
+    def __eq__(self, other):
+        """Override the default Equals behavior"""
+        if not isinstance(other, Account):
+            raise ValueError('Not a Account object')
+        return hash(self) == hash(other)
+
+    def __ne__(self, other):
+        """Override the default Unequal behavior"""
+        if not isinstance(other, Account):
+            raise ValueError('Not a Account object')
+        return hash(self) != hash(other)

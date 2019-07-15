@@ -37,7 +37,7 @@ from datetime import date
 from requests import Session
 from urllib3.util import parse_url
 
-from ynabintegrationslib.lib.core import YnabTransaction
+from ynabintegrationslib.lib.core import YnabTransaction, Account
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -344,7 +344,7 @@ class AbnAmroCreditCardTransaction(YnabTransaction):  # pylint: disable=too-many
         return self.transaction_date
 
 
-class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
+class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attributes
     """Models a credit card account"""
 
     def __init__(self, username, password, url='https://www.icscards.nl'):
@@ -357,7 +357,6 @@ class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
         self._account_number = None
         self._periods = None
         self._account = None
-        self._current_transactions = None
 
     def _get_authenticated_session(self):
         session = Session()
@@ -407,24 +406,6 @@ class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
         return self._account_number
 
     @property
-    def get_current_period_transactions(self):
-        if self._current_transactions is None:
-            current_month = date.today().strftime('%Y-%m')
-            url = f'{self._base_url}/sec/nl/sec/transactions'
-            params = {'accountNumber': self.account_number,
-                      'flushCache': True,
-                      'fromPeriod': current_month,
-                      'untilPeriod': current_month}
-            response = self._session.get(url, params=params)
-            response.raise_for_status()
-            self._current_transactions = [AbnAmroCreditCardTransaction(data)
-                                          for data in response.json()]
-        return self._current_transactions
-
-    def reset(self):
-        self._current_transactions = None
-
-    @property
     def periods(self):
         if self._periods is None:
             url = f'{self._base_url}/sec/nl/sec/periods'
@@ -460,3 +441,15 @@ class AbnAmroCreditCard:  #  pylint: disable=too-many-instance-attributes
         for period in self.periods:
             for transaction in period.transactions:
                 yield transaction
+
+    def get_current_transactions(self):
+        current_month = date.today().strftime('%Y-%m')
+        url = f'{self._base_url}/sec/nl/sec/transactions'
+        params = {'accountNumber': self.account_number,
+                  'flushCache': True,
+                  'fromPeriod': current_month,
+                  'untilPeriod': current_month}
+        response = self._session.get(url, params=params)
+        response.raise_for_status()
+        return [AbnAmroCreditCardTransaction(data)
+                for data in response.json()]

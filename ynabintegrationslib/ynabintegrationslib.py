@@ -33,6 +33,9 @@ Main code for ynabintegrationslib
 
 import logging
 
+from collections import deque
+from ynabintegrationslib.lib.core import Account
+
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
 __date__ = '''26-06-2019'''
@@ -48,3 +51,27 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 LOGGER_BASENAME = '''ynabintegrationslib'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
+
+TRANSACTIONS_QUEUE_SIZE = 100
+
+
+class Service:
+
+    def __init__(self):
+        self._accounts = []
+        self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
+
+    def register_account(self, account):
+        if not isinstance(account, Account):
+            raise ValueError('Object not of type Account')
+        if account not in self._accounts:
+            self._accounts.append(account)
+
+    def get_latest_transactions(self):
+        transactions = []
+        for account in self._accounts:
+            for transaction in account.get_current_transactions():
+                if transaction not in self._transactions:
+                    self._transactions.append(transaction)
+                    transactions.append(transaction)
+        return transactions
