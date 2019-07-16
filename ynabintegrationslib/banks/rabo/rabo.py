@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File: abnamro.py
+# File: rabo.py
 #
 # Copyright 2019 Costas Tyfoxylos
 #
@@ -24,7 +24,7 @@
 #
 
 """
-Main code for abnamro
+Main code for rabo
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -36,7 +36,7 @@ from base64 import b64decode
 from datetime import datetime
 import csv
 
-from .core import YnabTransaction
+from ynabintegrationslib.lib import YnabTransaction
 
 
 class RaboTransaction(YnabTransaction):
@@ -169,8 +169,8 @@ class Service:
         # csv_file = b64decode(self._retrieve_transactions_csv())
         return self._transactions
 
-    def _retrieve_transactions_from_file(self):
-        with open(self._transactions, newline='', encoding='iso-8859-1') as csv_file:
+    def _retrieve_transactions_from_file(self, encoding='iso-8859-1'):
+        with open(self._transactions, newline='', encoding=encoding) as csv_file:
             reader = csv.DictReader(csv_file, delimiter=',', quotechar='"')
             transactions = [line for line in reader]
         return[RaboTransaction(data) for data in transactions]

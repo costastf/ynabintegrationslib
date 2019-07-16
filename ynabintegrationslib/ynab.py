@@ -83,7 +83,7 @@ class Ynab:
     def default_budget(self):
         """Get the most recently edited budget and return it as the default"""
         last_modified = max([datetime.fromisoformat(item.last_modified_on) for item in self._budgets])
-        return next((budget.id for budget in self._budgets
+        return next((budget for budget in self._budgets
                      if datetime.fromisoformat(budget.last_modified_on) == last_modified), None)
 
     def get_budget_id_by_name(self, budget_name):
@@ -98,11 +98,40 @@ class Ynab:
         accounts = [Account(account) for account in list(response.json().get('data').get('accounts'))]
         return accounts
 
-    def upload_transaction(self, transaction):
-        # implement uploading of a single transaction
-        pass
+    def upload_transaction(self, transaction, budget_id, account_id):
+        transaction_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/transactions'
+        payload = {
+                    "transaction": {
+                        "account_id": account_id,
+                        "date": transaction.get('date'),
+                        "amount": transaction.get('amount'),
+                        "payee_name": transaction.get('payee_name'),
+                        "memo": transaction.get('memo')
+                    }
+                  }
+        response = self._session.post(transaction_url, json=payload)
+        response.raise_for_status()
+        return response
 
-    def upload_transactions_bulk(self, transactions):
+    def upload_transactions_bulk(self, transactions, budget_id, account_id):
+        transaction_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/transactions'
+        ynab_transactions = []
+        for transaction in transactions:
+            single_transaction = {
+                "account_id": account_id,
+                "date": transaction.get('date'),
+                "amount": transaction.get('amount'),
+                "payee_name": transaction.get('payee_name'),
+                "memo": transaction.get('memo')
+            }
+            ynab_transactions.append(single_transaction)
+        payload = {
+            "transactions": ynab_transactions
+        }
+        response = self._session.post(transaction_url, json=payload)
+        response.raise_for_status()
+        return response
+
         # implement uploading of multiple transactions
         pass
 
@@ -144,6 +173,9 @@ class Budget:
     @property
     def name(self):
         return self._data.get('name')
+
+    def get_account_by_name(self, name):
+        return next((account for account in self.accounts if account.name.lower() == name.lower()), None)
 
 
 class Account:
