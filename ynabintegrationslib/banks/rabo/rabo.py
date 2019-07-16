@@ -53,7 +53,7 @@ class RaboTransaction(YnabTransaction):
     @property
     def date(self):
         date = datetime.strptime(self._data.get('Datum', '1999-01-01'), '%Y-%M-%d')
-        return date.strftime('%Y-%d-%M')
+        return date.strftime('%Y-%M-%d')
 
     @property
     def amount(self):

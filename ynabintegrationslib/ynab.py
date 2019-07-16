@@ -129,12 +129,9 @@ class Ynab:
             "transactions": ynab_transactions
         }
         response = self._session.post(transaction_url, json=payload)
+        print(response.content)
         response.raise_for_status()
         return response
-
-        # implement uploading of multiple transactions
-        pass
-
 
 class Budget:
 
