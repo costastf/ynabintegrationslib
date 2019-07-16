@@ -136,13 +136,13 @@ class YnabTransaction(abc.ABC):
 
     def __eq__(self, other):
         """Override the default Equals behavior"""
-        if not isinstance(other, YnabTransaction):
+        if not isinstance(other, self.__class__):
             raise ValueError('Not a YnabTransaction object')
         return hash(self) == hash(other)
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
-        if not isinstance(other, YnabTransaction):
+        if not isinstance(other, self.__class__):
             raise ValueError('Not a YnabTransaction object')
         return hash(self) != hash(other)
 
@@ -173,12 +173,12 @@ class Account(abc.ABC):
 
     def __eq__(self, other):
         """Override the default Equals behavior"""
-        if not isinstance(other, Account):
+        if not isinstance(other, self.__class__):
             raise ValueError('Not a Account object')
         return hash(self) == hash(other)
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
-        if not isinstance(other, Account):
+        if not isinstance(other, self.__class__:
             raise ValueError('Not a Account object')
         return hash(self) != hash(other)
