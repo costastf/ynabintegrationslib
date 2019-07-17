@@ -32,6 +32,7 @@ Import all parts from banks here
    http://google.github.io/styleguide/pyguide.html
 """
 from .abnamro import AbnAmroContract, AbnAmroCreditCard
+from .rabo import RaboTransaction, Service
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -45,3 +46,5 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 # This is to 'use' the module(s), so lint doesn't complain
 assert AbnAmroContract
 assert AbnAmroCreditCard
+assert RaboTransaction
+assert Service

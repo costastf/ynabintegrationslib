@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# File: __init__.py
+# File: configuration.py
 #
 # Copyright 2019 Costas Tyfoxylos
 #
@@ -24,24 +24,9 @@
 #
 
 """
-abnamro package
-
-Import all parts from abnamro here
+Main code for configuration
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
+
 """
-from .rabo import RaboTransaction, Service
-
-__author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
-__docformat__ = '''google'''
-__date__ = '''08-07-2019'''
-__copyright__ = '''Copyright 2019, Costas Tyfoxylos'''
-__license__ = '''MIT'''
-__maintainer__ = '''Costas Tyfoxylos'''
-__email__ = '''<costas.tyf@gmail.com>'''
-__status__ = '''Development'''  # "Prototype", "Development", "Production".
-
-# This is to 'use' the module(s), so lint doesn't complain
-assert RaboTransaction
-assert Service
