@@ -58,12 +58,13 @@ class Ynab:
         self._logger = logging.getLogger(logger_name)
         self._api_version = 'v1'
         self._base_url = url
+        self.api_url = f'{self._base_url}/{self._api_version}'
         self._session = self._get_authenticated_session(token)
         self._budgets = self.budgets
         self._default_budget = self.default_budget
 
     def _get_authenticated_session(self, token):
-        budget_url = f'{self._base_url}/{self._api_version}/budgets'
+        budget_url = f'{self.api_url}/budgets'
         session = Session()
         headers = {'Authorization': f'Bearer {token}'}
         session.headers.update(headers)
@@ -73,33 +74,20 @@ class Ynab:
 
     @property
     def budgets(self):
-        budget_url = f'{self._base_url}/{self._api_version}/budgets'
+        budget_url = f'{self.api_url}/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        budgets = [Budget(self, budget) for budget in response.json().get('data').get('budgets')]
-        return budgets
+        return [Budget(self, budget) for budget in response.json().get('data').get('budgets')]
 
-    @property
-    def default_budget(self):
-        """Get the most recently edited budget and return it as the default"""
-        last_modified = max([datetime.fromisoformat(item.last_modified_on) for item in self._budgets])
-        return next((budget for budget in self._budgets
-                     if datetime.fromisoformat(budget.last_modified_on) == last_modified), None)
+    def get_budget_by_name(self, budget_name):
+        return next((budget for budget in self._budgets if budget.name.lower() == budget_name.lower()), None)
 
-    def get_budget_id_by_name(self, budget_name):
-        return next(
-            (budget.id for budget in self._budgets if budget.name.lower() == budget_name.lower()),
-            None)
-
-    def get_accounts_for_budget(self, budget_id):
-        account_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/accounts'
-        response = self._session.get(account_url)
-        response.raise_for_status()
-        accounts = [Account(account) for account in list(response.json().get('data').get('accounts'))]
-        return accounts
+    def get_accounts_for_budget(self, budget_name):
+        budget = self.get_budget_by_name(budget_name)
+        return budget.accounts
 
     def upload_transactions(self, transactions, budget_id, account_id):
-        transaction_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/transactions'
+        transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
         payload = {"transactions": [transaction.payload for transaction in list(transactions)]}
         response = self._session.post(transaction_url, json=payload)
         response.raise_for_status()
@@ -114,7 +102,10 @@ class Budget:
 
     @property
     def accounts(self):
-        return self._ynab.get_accounts_for_budget(self.id)
+        account_url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
+        response = self._ynab._session.get(account_url)
+        response.raise_for_status()
+        return [Account(account) for account in response.json().get('data', {}).get('accounts', [])]
 
     @property
     def currency_format(self):
@@ -192,6 +183,3 @@ class Account:
     @property
     def type(self):
         return self._data.get('type')
-
-
-
