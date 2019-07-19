@@ -109,27 +109,11 @@ class AccountAuthenticator(abc.ABC):
         self._driver.quit()
 
 
-class YnabTransaction(abc.ABC):
+class Transaction(abc.ABC):
 
     def __init__(self, data):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self._data = data
-
-    @abc.abstractmethod
-    def amount(self):
-        pass
-
-    @abc.abstractmethod
-    def payee_name(self):
-        pass
-
-    @abc.abstractmethod
-    def memo(self):
-        pass
-
-    @abc.abstractmethod
-    def date(self):
-        pass
 
     def __hash__(self):
         return hash(str(self._data))
@@ -137,39 +121,24 @@ class YnabTransaction(abc.ABC):
     def __eq__(self, other):
         """Override the default Equals behavior"""
         if not isinstance(other, self.__class__):
-            raise ValueError('Not a YnabTransaction object')
+            raise ValueError('Not a Transaction object')
         return hash(self) == hash(other)
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
         if not isinstance(other, self.__class__):
-            raise ValueError('Not a YnabTransaction object')
+            raise ValueError('Not a Transaction object')
         return hash(self) != hash(other)
-
-    @staticmethod
-    def _clean_up(string):
-        return " ".join(string.split())
-
-    @property
-    def to_ynab(self):
-        return {'amount': self.amount,
-                'payee_name': self.payee_name,
-                'memo': self.memo,
-                'date': self.date}
 
 
 class Account(abc.ABC):
 
-    @abc.abstractmethod
-    def transactions(self):
-        pass
-
-    @abc.abstractmethod
-    def get_current_transactions(self):
-        pass
+    def __init__(self, data):
+        self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
+        self._data = data
 
     def __hash__(self):
-        return hash(str(self.__dict__))
+        return hash(str(self._data))
 
     def __eq__(self, other):
         """Override the default Equals behavior"""
@@ -179,6 +148,6 @@ class Account(abc.ABC):
 
     def __ne__(self, other):
         """Override the default Unequal behavior"""
-        if not isinstance(other, self.__class__:
+        if not isinstance(other, self.__class__):
             raise ValueError('Not a Account object')
         return hash(self) != hash(other)

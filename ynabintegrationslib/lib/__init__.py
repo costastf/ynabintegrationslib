@@ -31,7 +31,7 @@ Import all parts from core here
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
 """
-from .core import AccountAuthenticator, YnabTransaction
+from .core import AccountAuthenticator, Transaction
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -44,4 +44,4 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 # This is to 'use' the module(s), so lint doesn't complain
 assert AccountAuthenticator
-assert YnabTransaction
+assert Transaction

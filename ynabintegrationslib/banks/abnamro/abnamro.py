@@ -38,7 +38,7 @@ from time import sleep
 from selenium.common.exceptions import TimeoutException
 from urllib3.util import parse_url
 
-from ynabintegrationslib.lib.core import YnabTransaction, AccountAuthenticator, Account
+from ynabintegrationslib.lib.core import Transaction, AccountAuthenticator, Account
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -107,7 +107,7 @@ class Contract:
         return self._data.get('parentContract')
 
 
-class AbnAmroAccountTransaction(YnabTransaction):  # pylint: disable=too-many-public-methods
+class AbnAmroAccountTransaction(Transaction):  # pylint: disable=too-many-public-methods
     """Models a banking transaction"""
 
     @property

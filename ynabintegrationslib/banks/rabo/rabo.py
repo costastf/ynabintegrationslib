@@ -36,10 +36,10 @@ from base64 import b64decode
 from datetime import datetime
 import csv
 
-from ynabintegrationslib.lib import YnabTransaction
+from ynabintegrationslib.lib import Transaction
 
 
-class RaboTransaction(YnabTransaction):
+class RaboTransaction(Transaction):
     """Models a Rabobank transaction"""
 
     @property

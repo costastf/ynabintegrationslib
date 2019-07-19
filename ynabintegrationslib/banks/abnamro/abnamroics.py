@@ -37,7 +37,7 @@ from datetime import date
 from requests import Session
 from urllib3.util import parse_url
 
-from ynabintegrationslib.lib.core import YnabTransaction, Account
+from ynabintegrationslib.lib.core import Transaction, Account
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -241,7 +241,7 @@ class Period:
         return self._transactions
 
 
-class AbnAmroCreditCardTransaction(YnabTransaction):  # pylint: disable=too-many-public-methods
+class AbnAmroCreditCardTransaction(Transaction):  # pylint: disable=too-many-public-methods
     """Models a credit card transaction"""
 
     @property
