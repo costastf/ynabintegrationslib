@@ -281,7 +281,7 @@ class AbnAmroContract(Account):  # pylint: disable=too-many-instance-attributes
             for transaction in transactions:
                 yield transaction
 
-    def get_current_transactions(self):
+    def get_latest_transactions(self):
         url = f'{self._base_url}/mutations/{self.iban_number}'
         headers = {'x-aab-serviceversion': 'v3'}
         response = self._session.get(url, headers=headers)

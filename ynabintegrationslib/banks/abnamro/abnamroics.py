@@ -324,25 +324,6 @@ class AbnAmroCreditCardTransaction(Transaction):  # pylint: disable=too-many-pub
     def charge_back_allowed(self):
         return self._data.get('chargeBackAllowed')
 
-    @property
-    def amount(self):
-        return int(self.billing_amount * 100)
-
-    @property
-    def payee_name(self):
-        return self.description
-
-    @property
-    def memo(self):
-        return (f'Description: {self.description}\n'
-                f'Buyer: {self.embossing_name}\n'
-                f'Merchant Category: {self.merchant_category_description}\n'
-                f'Amount: {self.billing_amount} {self.billing_currency}')
-
-    @property
-    def date(self):
-        return self.transaction_date
-
 
 class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attributes
     """Models a credit card account"""
@@ -442,7 +423,7 @@ class AbnAmroCreditCard(Account):  #  pylint: disable=too-many-instance-attribut
             for transaction in period.transactions:
                 yield transaction
 
-    def get_current_transactions(self):
+    def get_current_period_transactions(self):
         url = f'{self._base_url}/sec/nl/sec/transactions'
         params = {'accountNumber': self.account_number,
                   'flushCache': True}

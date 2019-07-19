@@ -70,7 +70,7 @@ class Service:
     def get_latest_transactions(self):
         transactions = []
         for account in self._accounts:
-            for transaction in account.get_current_transactions():
+            for transaction in account.get_latest_transactions():
                 if transaction not in self._transactions:
                     self._transactions.append(transaction)
                     transactions.append(transaction)

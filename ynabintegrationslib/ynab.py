@@ -88,10 +88,13 @@ class Ynab:
 
     def upload_transactions(self, transactions, budget_id, account_id):
         transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
-        payload = {"transactions": [transaction.payload for transaction in list(transactions)]}
+        payloads = [transaction.payload for transaction in list(transactions)]
+        if not payloads:
+            return True
+        payload = {"transactions": payloads}
         response = self._session.post(transaction_url, json=payload)
         response.raise_for_status()
-        return response
+        return response.ok
 
 
 class Budget:
