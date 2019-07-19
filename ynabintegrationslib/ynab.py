@@ -98,40 +98,13 @@ class Ynab:
         accounts = [Account(account) for account in list(response.json().get('data').get('accounts'))]
         return accounts
 
-    def upload_transaction(self, transaction, budget_id, account_id):
+    def upload_transactions(self, transactions, budget_id, account_id):
         transaction_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/transactions'
-        payload = {
-                    "transaction": {
-                        "account_id": account_id,
-                        "date": transaction.get('date'),
-                        "amount": transaction.get('amount'),
-                        "payee_name": transaction.get('payee_name'),
-                        "memo": transaction.get('memo')
-                    }
-                  }
+        payload = {"transactions": [transaction.payload for transaction in list(transactions)]}
         response = self._session.post(transaction_url, json=payload)
         response.raise_for_status()
         return response
 
-    def upload_transactions_bulk(self, transactions, budget_id, account_id):
-        transaction_url = f'{self._base_url}/{self._api_version}/budgets/{budget_id}/transactions'
-        ynab_transactions = []
-        for transaction in transactions:
-            single_transaction = {
-                "account_id": account_id,
-                "date": transaction.get('date'),
-                "amount": transaction.get('amount'),
-                "payee_name": transaction.get('payee_name'),
-                "memo": transaction.get('memo')
-            }
-            ynab_transactions.append(single_transaction)
-        payload = {
-            "transactions": ynab_transactions
-        }
-        response = self._session.post(transaction_url, json=payload)
-        print(response.content)
-        response.raise_for_status()
-        return response
 
 class Budget:
 
