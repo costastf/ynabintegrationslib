@@ -123,8 +123,8 @@ class Ynab:
         payloads = [transaction.payload for transaction in list(transactions)]
         if not payloads:
             return True
-        payload = {"transactions": payloads}
-        response = self._session.post(transaction_url, json=payload)
+        response = self._session.post(transaction_url, json={"transactions": payloads})
+        print(response.text)
         response.raise_for_status()
         return response.ok
 
