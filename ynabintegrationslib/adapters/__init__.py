@@ -32,6 +32,13 @@ Import all parts from adapters here
    http://google.github.io/styleguide/pyguide.html
 """
 
+from .adapters import (AbnAmroCreditCardAccount,
+                       AbnAmroAccountTransaction,
+                       AbnAmroAccount,
+                       AbnAmroCreditCardTransaction,
+                       YnabAccount,
+                       YnabTransaction)
+
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
 __date__ = '''08-07-2019'''
@@ -42,4 +49,9 @@ __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 # This is to 'use' the module(s), so lint doesn't complain
-
+assert AbnAmroCreditCardTransaction
+assert AbnAmroAccount
+assert AbnAmroAccountTransaction
+assert AbnAmroCreditCardAccount
+assert YnabTransaction
+assert YnabAccount

@@ -32,8 +32,9 @@ Main code for ynab
 """
 
 import logging
+
 from requests import Session
-from datetime import datetime
+from ynabintegrationslib.ynabintegrationslib import InvalidBudget
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -52,6 +53,7 @@ LOGGER.addHandler(logging.NullHandler())
 
 
 class Ynab:
+    """Models the ynab service"""
 
     def __init__(self, token, url='https://api.youneedabudget.com'):
         logger_name = f'{LOGGER_BASENAME}.{self.__class__.__name__}'
@@ -74,20 +76,51 @@ class Ynab:
 
     @property
     def budgets(self):
+        """Retrieves the budgets"""
         budget_url = f'{self.api_url}/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
-        return [Budget(self, budget) for budget in response.json().get('data').get('budgets')]
+        return [Budget(self, budget)
+                for budget in response.json().get('data', {}).get('budgets', [])]
 
     def get_budget_by_name(self, budget_name):
+        """Retrieves a budget by it's name
+
+        Args:
+            budget_name (str): The name of the budget to retrieve
+
+        Returns:
+            budget (Budget): A budget object on success, None otherwise
+
+        """
         return next((budget for budget in self._budgets if budget.name.lower() == budget_name.lower()), None)
 
     def get_accounts_for_budget(self, budget_name):
+        """Retrieves the accounts for a budget
+
+        Args:
+            budget_name (str): The budget's name to retrieve accounts for
+
+        Returns:
+            accounts (list): A list of accounts that belong to that budget
+
+        """
         budget = self.get_budget_by_name(budget_name)
+        if not budget:
+            raise InvalidBudget(budget_name)
         return budget.accounts
 
-    def upload_transactions(self, transactions, budget_id, account_id):
-        transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
+    def upload_transactions(self, transactions, account):
+        """Uploads the provided transaction objects to YNAB
+
+        Args:
+            transactions (list|Transaction): A list of transaction objects or a single transaction object
+            account (Account): The account object to upload the transactions to
+
+        Returns:
+
+        """
+        transaction_url = f'{self.api_url}/budgets/{account.budget.id}/transactions'
         payloads = [transaction.payload for transaction in list(transactions)]
         if not payloads:
             return True
@@ -108,7 +141,8 @@ class Budget:
         url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
         response = self._ynab._session.get(url)
         response.raise_for_status()
-        return [Account(account) for account in response.json().get('data', {}).get('accounts', [])]
+        return [Account(account, self)
+                for account in response.json().get('data', {}).get('accounts', [])]
 
     @property
     def currency_format(self):
@@ -144,8 +178,13 @@ class Budget:
 
 class Account:
 
-    def __init__(self, data):
+    def __init__(self, data, budget):
         self._data = data
+        self._budget = budget
+
+    @property
+    def budget(self):
+        return self._budget
 
     @property
     def balance(self):

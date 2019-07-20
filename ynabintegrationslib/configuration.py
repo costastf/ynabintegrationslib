@@ -31,8 +31,8 @@ Main code for configuration
 
 """
 
-Configuration = {'ynab_token': 'TOKEN',
-                 'transaction_queue_size' : 1000,
+CONFIGURATION = {'ynab_token': 'TOKEN',
+                 'transaction_queue_size': 1000,
                  'upload_frequency': 45,
                  'accounts': [{'bank': 'AbnAmro',
                                'type': 'account',

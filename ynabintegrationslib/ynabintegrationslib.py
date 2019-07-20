@@ -34,7 +34,7 @@ Main code for ynabintegrationslib
 import logging
 
 from collections import deque
-from ynabintegrationslib.lib.core import Account
+from .adapters import YnabAccount
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -56,18 +56,34 @@ TRANSACTIONS_QUEUE_SIZE = 100
 
 
 class Service:
+    """Models a service to retrieve transactions and upload them to YNAB"""
 
     def __init__(self):
         self._accounts = []
         self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
 
     def register_account(self, account):
-        if not isinstance(account, Account):
-            raise ValueError('Object not of type Account')
+        """Registers an account on the service
+
+        Args:
+            account (Account): The bank account to register
+
+        Returns:
+            boolean (bool): True on success, False otherwise
+
+        """
+        if not isinstance(account, YnabAccount):
+            raise ValueError('Object not of type YnabAccount')
         if account not in self._accounts:
             self._accounts.append(account)
 
     def get_latest_transactions(self):
+        """Retrieves the latest transactions from all accounts
+
+        Returns:
+            transactions (Transaction): A list of transactions to upload to YNAB
+
+        """
         transactions = []
         for account in self._accounts:
             for transaction in account.get_latest_transactions():
