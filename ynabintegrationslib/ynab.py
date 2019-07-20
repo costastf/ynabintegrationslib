@@ -120,7 +120,9 @@ class Ynab:
 
         """
         transaction_url = f'{self.api_url}/budgets/{account.budget.id}/transactions'
-        payloads = [transaction.payload for transaction in list(transactions)]
+        if not isinstance(transactions, (list, tuple, set)):
+            transactions = [transactions]
+        payloads = [transaction.payload for transaction in transactions]
         if not payloads:
             return True
         response = self._session.post(transaction_url, json={"transactions": payloads})

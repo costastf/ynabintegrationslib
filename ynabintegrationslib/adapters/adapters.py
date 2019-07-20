@@ -129,7 +129,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def date(self):
         """Date"""
-        return self._transaction.transaction_date.strftime('%Y-%m-%d')
+        return self._transaction.transaction_date
 
 
 class AbnAmroCreditCardTransaction(YnabTransaction):
@@ -227,9 +227,9 @@ class AbnAmroCreditCardAccount(YnabAccount):
     def transactions(self):
         """Transactions"""
         for transaction in self.bank_account.transactions:
-            yield AbnAmroAccountTransaction(transaction, self._ynab_account)
+            yield AbnAmroCreditCardTransaction(transaction, self._ynab_account)
 
     def get_latest_transactions(self):
         """Retrieves latest transactions"""
         for transaction in self.bank_account.get_current_period_transactions():
-            yield AbnAmroAccountTransaction(transaction, self._ynab_account)
+            yield AbnAmroCreditCardTransaction(transaction, self._ynab_account)
