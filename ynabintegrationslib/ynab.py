@@ -184,7 +184,7 @@ class Budget:
         """Retrieves an account by name
 
         Args:
-            name (str): The name of the account to retireve
+            name (str): The name of the account to retrieve
 
         Returns:
             account (Account): An account object on success, None otherwise.
