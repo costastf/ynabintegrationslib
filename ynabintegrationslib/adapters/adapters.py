@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # File: adapters.py
@@ -144,11 +143,20 @@ class AbnAmroCreditCardTransaction(YnabTransaction):
 
 class YnabAccount(abc.ABC):
 
-    def __init__(self, account, budget_name, account_name):
+    def __init__(self, account, ynab_service, budget_name, account_name):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self._account = account
-        self._budget_name = budget_name
-        self._account_name = account_name
+        self.bank_account = account
+        self.ynab = ynab_service
+        self._budget = self.ynab.get_budget_by_name(budget_name)
+        self._ynab_account = self.budget.get_account_by_name(account_name)
+
+    @property
+    def budget(self):
+        return self._budget
+
+    @property
+    def ynab_account(self):
+        return self._ynab_account
 
     def __hash__(self):
         return hash(self._account)
@@ -178,17 +186,17 @@ class AbnAmroAccount(YnabAccount):
 
     @property
     def transactions(self):
-        return self._account.transactions
+        return self.bank_account.transactions
 
     def get_latest_transactions(self):
-        return self._account.get_latest_transactions()
+        return self.bank_account.get_latest_transactions()
 
 
 class AbnAmroCreditCardAccount(YnabAccount):
 
     @property
     def transactions(self):
-        return self._account.transactions
+        return self.bank_account.transactions
 
     def get_latest_transactions(self):
-        return self._account.get_current_period_transactions()
+        return self.bank_account.get_current_period_transactions()

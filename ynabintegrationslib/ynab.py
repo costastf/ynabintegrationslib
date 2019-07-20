@@ -105,8 +105,8 @@ class Budget:
 
     @property
     def accounts(self):
-        account_url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
-        response = self._ynab._session.get(account_url)
+        url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
+        response = self._ynab._session.get(url)
         response.raise_for_status()
         return [Account(account) for account in response.json().get('data', {}).get('accounts', [])]
 
