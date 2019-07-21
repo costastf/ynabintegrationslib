@@ -114,7 +114,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def amount(self):
         """Amount"""
-        return int(float(self._transaction.amount) * 1000)
+        return int(float(self._transaction.amount) * 10)
 
     @property
     def payee_name(self):
@@ -123,13 +123,13 @@ class AbnAmroAccountTransaction(YnabTransaction):
 
     @property
     def memo(self):
-        """Memo"""
-        return self._transaction.description
+        """Memo of maximum 200 characters"""
+        return self._transaction.description[:200]
 
     @property
     def date(self):
         """Date"""
-        return self._transaction.transaction_date
+        return self._transaction.transaction_date.strftime('%Y-%m-%d')
 
 
 class AbnAmroCreditCardTransaction(YnabTransaction):
