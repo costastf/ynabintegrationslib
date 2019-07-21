@@ -129,7 +129,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def date(self):
         """Date"""
-        return self._transaction.transaction_date
+        return self._transaction.transaction_date.strftime('%Y-%m-%d')
 
 
 class AbnAmroCreditCardTransaction(YnabTransaction):

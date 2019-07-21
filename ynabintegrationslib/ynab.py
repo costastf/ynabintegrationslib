@@ -126,8 +126,8 @@ class Ynab:
         if not payloads:
             return True
         response = self._session.post(transaction_url, json={"transactions": payloads})
-        print(response.text)
-        response.raise_for_status()
+        if not response.ok:
+            self._logger.error('Unsuccessful attempt to upload, response was %s', response.text)
         return response.ok
 
 
