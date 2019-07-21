@@ -138,7 +138,8 @@ class AbnAmroCreditCardTransaction(YnabTransaction):
     @property
     def amount(self):
         """Amount"""
-        return int(self._transaction.billing_amount * 1000)
+        amount = int(self._transaction.billing_amount * 1000)
+        return abs(amount) if self._transaction.type_of_transaction == 'P' else amount * -1
 
     @property
     def payee_name(self):
