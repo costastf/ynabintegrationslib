@@ -24,7 +24,7 @@
 #
 
 """
-core package
+core package.
 
 Import all parts from adapters here
 
