@@ -114,7 +114,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def amount(self):
         """Amount"""
-        return int(float(self._transaction.amount) * 10)
+        return int(float(self._transaction.amount) * 1000)
 
     @property
     def payee_name(self):
