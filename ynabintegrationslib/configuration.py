@@ -24,7 +24,7 @@
 #
 
 """
-Main code for configuration
+Main code for configuration.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html

@@ -24,7 +24,7 @@
 #
 
 """
-Main code for adapters
+Main code for adapters.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -52,7 +52,7 @@ LOGGER.addHandler(logging.NullHandler())
 
 
 class YnabTransaction(abc.ABC):
-    """Models the interface for ynab transaction"""
+    """Models the interface for ynab transaction."""
 
     def __init__(self, transaction, account):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
@@ -63,35 +63,35 @@ class YnabTransaction(abc.ABC):
         return hash(self._transaction)
 
     def __eq__(self, other):
-        """Override the default Equals behavior"""
+        """Override the default Equals behavior."""
         if not isinstance(other, self.__class__):
             raise ValueError('Not a YnabTransaction object')
         return hash(self) == hash(other)
 
     def __ne__(self, other):
-        """Override the default Unequal behavior"""
+        """Override the default Unequal behavior."""
         if not isinstance(other, self.__class__):
             raise ValueError('Not a YnabTransaction object')
         return hash(self) != hash(other)
 
     @abc.abstractmethod
     def amount(self):
-        """Amount"""
+        """Amount."""
         pass
 
     @abc.abstractmethod
     def payee_name(self):
-        """Payee Name"""
+        """Payee Name."""
         pass
 
     @abc.abstractmethod
     def memo(self):
-        """Memo"""
+        """Memo."""
         pass
 
     @abc.abstractmethod
     def date(self):
-        """Date"""
+        """Date."""
         pass
 
     @staticmethod
@@ -100,7 +100,7 @@ class YnabTransaction(abc.ABC):
 
     @property
     def payload(self):
-        """Payload"""
+        """Payload."""
         return {'account_id': self._account.id,
                 'amount': self.amount,
                 'payee_name': self.payee_name,
@@ -109,46 +109,46 @@ class YnabTransaction(abc.ABC):
 
 
 class AbnAmroAccountTransaction(YnabTransaction):
-    """Models an Abn Amro account transaction"""
+    """Models an Abn Amro account transaction."""
 
     @property
     def amount(self):
-        """Amount"""
+        """Amount."""
         return int(float(self._transaction.amount) * 1000)
 
     @property
     def payee_name(self):
-        """Payee Name"""
+        """Payee Name."""
         return self._clean_up(self._transaction.counter_account_name)
 
     @property
     def memo(self):
-        """Memo"""
-        return self._transaction.description
+        """Memo of maximum 200 characters."""
+        return self._transaction.description[:200]
 
     @property
     def date(self):
-        """Date"""
+        """Date."""
         return self._transaction.transaction_date.strftime('%Y-%m-%d')
 
 
 class AbnAmroCreditCardTransaction(YnabTransaction):
-    """Models an Abn Amro credit card transaction"""
+    """Models an Abn Amro credit card transaction."""
 
     @property
     def amount(self):
-        """Amount"""
+        """Amount."""
         amount = int(self._transaction.billing_amount * 1000)
         return abs(amount) if self._transaction.type_of_transaction == 'P' else amount * -1
 
     @property
     def payee_name(self):
-        """Payee Name"""
+        """Payee Name."""
         return self._clean_up(self._transaction.description)
 
     @property
     def memo(self):
-        """Memo"""
+        """Memo."""
         return (f'Description: {self._transaction.description}\n'
                 f'Buyer: {self._transaction.embossing_name}\n'
                 f'Merchant Category: {self._transaction.merchant_category_description}\n'
@@ -156,12 +156,12 @@ class AbnAmroCreditCardTransaction(YnabTransaction):
 
     @property
     def date(self):
-        """Date"""
+        """Date."""
         return self._transaction.transaction_date
 
 
 class YnabAccount(abc.ABC):
-    """Models a YNAB account"""
+    """Models a YNAB account."""
 
     def __init__(self, account, ynab_service, budget_name, account_name):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
@@ -172,65 +172,65 @@ class YnabAccount(abc.ABC):
 
     @property
     def budget(self):
-        """Budget"""
+        """Budget."""
         return self._budget
 
     @property
     def ynab_account(self):
-        """Ynab account"""
+        """Ynab account."""
         return self._ynab_account
 
     def __hash__(self):
         return hash(self.bank_account)
 
     def __eq__(self, other):
-        """Override the default Equals behavior"""
+        """Override the default Equals behavior."""
         if not isinstance(other, self.__class__):
             raise ValueError('Not a Account object')
         return hash(self) == hash(other)
 
     def __ne__(self, other):
-        """Override the default Unequal behavior"""
+        """Override the default Unequal behavior."""
         if not isinstance(other, self.__class__):
             raise ValueError('Not a Account object')
         return hash(self) != hash(other)
 
     @abc.abstractmethod
     def transactions(self):
-        """Transactions"""
+        """Transactions."""
         pass
 
     @abc.abstractmethod
     def get_latest_transactions(self):
-        """Retrieves latest transactions from account"""
+        """Retrieves latest transactions from account."""
         pass
 
 
 class AbnAmroAccount(YnabAccount):
-    """Models an Abn Amro account"""
+    """Models an Abn Amro account."""
 
     @property
     def transactions(self):
-        """Transactions"""
+        """Transactions."""
         for transaction in self.bank_account.transactions:
             yield AbnAmroAccountTransaction(transaction, self._ynab_account)
 
     def get_latest_transactions(self):
-        """Retrieves latest transactions"""
+        """Retrieves latest transactions."""
         for transaction in self.bank_account.get_latest_transactions():
             yield AbnAmroAccountTransaction(transaction, self._ynab_account)
 
 
 class AbnAmroCreditCardAccount(YnabAccount):
-    """Models an Abn Amro credit card account"""
+    """Models an Abn Amro credit card account."""
 
     @property
     def transactions(self):
-        """Transactions"""
+        """Transactions."""
         for transaction in self.bank_account.transactions:
             yield AbnAmroCreditCardTransaction(transaction, self._ynab_account)
 
     def get_latest_transactions(self):
-        """Retrieves latest transactions"""
+        """Retrieves latest transactions."""
         for transaction in self.bank_account.get_current_period_transactions():
             yield AbnAmroCreditCardTransaction(transaction, self._ynab_account)

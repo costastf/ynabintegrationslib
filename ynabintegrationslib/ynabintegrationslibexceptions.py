@@ -24,7 +24,7 @@
 #
 
 """
-Custom exception code for ynabintegrationslib
+Custom exception code for ynabintegrationslib.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -43,4 +43,4 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 
 class InvalidBudget(Exception):
-    """The budget does not exist on YNAB"""
+    """The budget does not exist on YNAB."""

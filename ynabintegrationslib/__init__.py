@@ -24,7 +24,7 @@
 #
 
 """
-ynabintegrationslib package
+ynabintegrationslib package.
 
 Import all parts from ynabintegrationslib here
 

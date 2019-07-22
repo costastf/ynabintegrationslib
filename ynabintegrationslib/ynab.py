@@ -24,7 +24,7 @@
 #
 
 """
-Main code for ynab
+Main code for ynab.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -53,7 +53,7 @@ LOGGER.addHandler(logging.NullHandler())
 
 
 class Ynab:
-    """Models the ynab service"""
+    """Models the ynab service."""
 
     def __init__(self, token, url='https://api.youneedabudget.com'):
         logger_name = f'{LOGGER_BASENAME}.{self.__class__.__name__}'
@@ -74,7 +74,7 @@ class Ynab:
 
     @property
     def budgets(self):
-        """Retrieves the budgets"""
+        """Retrieves the budgets."""
         budget_url = f'{self.api_url}/budgets'
         response = self._session.get(budget_url)
         response.raise_for_status()
@@ -82,7 +82,7 @@ class Ynab:
                 for budget in response.json().get('data', {}).get('budgets', [])]
 
     def get_budget_by_name(self, budget_name):
-        """Retrieves a budget by it's name
+        """Retrieves a budget by it's name.
 
         Args:
             budget_name (str): The name of the budget to retrieve
@@ -94,7 +94,7 @@ class Ynab:
         return next((budget for budget in self.budgets if budget.name.lower() == budget_name.lower()), None)
 
     def get_accounts_for_budget(self, budget_name):
-        """Retrieves the accounts for a budget
+        """Retrieves the accounts for a budget.
 
         Args:
             budget_name (str): The budget's name to retrieve accounts for
@@ -109,7 +109,7 @@ class Ynab:
         return budget.accounts
 
     def upload_transactions(self, transactions, account):
-        """Uploads the provided transaction objects to YNAB
+        """Uploads the provided transaction objects to YNAB.
 
         Args:
             transactions (list|Transaction): A list of transaction objects or a single transaction object
@@ -132,7 +132,7 @@ class Ynab:
 
 
 class Budget:
-    """Models the YNAB budget object"""
+    """Models the YNAB budget object."""
 
     def __init__(self, ynab, data):
         self._data = data
@@ -140,7 +140,7 @@ class Budget:
 
     @property
     def accounts(self):
-        """Accounts of the budget"""
+        """Accounts of the budget."""
         url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
         response = self._ynab._session.get(url)  # pylint: disable=protected-access
         response.raise_for_status()
@@ -149,41 +149,41 @@ class Budget:
 
     @property
     def currency_format(self):
-        """Currency format"""
+        """Currency format."""
         return self._data.get('currency_format')
 
     @property
     def date_format(self):
-        """Date format"""
+        """Date format."""
         return self._data.get('date_format')
 
     @property
     def first_month(self):
-        """First month"""
+        """First month."""
         return self._data.get('first_month')
 
     @property
     def id(self):  # pylint: disable=invalid-name
-        """ID"""
+        """ID."""
         return self._data.get('id')
 
     @property
     def last_modified_on(self):
-        """Last modified on"""
+        """Last modified on."""
         return self._data.get('last_modified_on')
 
     @property
     def last_month(self):
-        """Last month"""
+        """Last month."""
         return self._data.get('last_month')
 
     @property
     def name(self):
-        """Name"""
+        """Name."""
         return self._data.get('name')
 
     def get_account_by_name(self, name):
-        """Retrieves an account by name
+        """Retrieves an account by name.
 
         Args:
             name (str): The name of the account to retrieve
@@ -196,7 +196,7 @@ class Budget:
 
 
 class Account:
-    """Models the account of a YNAB Budget"""
+    """Models the account of a YNAB Budget."""
 
     def __init__(self, data, budget):
         self._data = data
@@ -204,55 +204,55 @@ class Account:
 
     @property
     def budget(self):
-        """Budget"""
+        """Budget."""
         return self._budget
 
     @property
     def balance(self):
-        """Balance"""
+        """Balance."""
         return self._data.get('balance')
 
     @property
     def cleared_balance(self):
-        """Cleared balance"""
+        """Cleared balance."""
         return self._data.get('cleared_balance')
 
     @property
     def closed(self):
-        """Closed"""
+        """Closed."""
         return self._data.get('closed')
 
     @property
     def deleted(self):
-        """Deleted"""
+        """Deleted."""
         return self._data.get('deleted')
 
     @property
     def id(self):  # pylint: disable=invalid-name
-        """ID"""
+        """ID."""
         return self._data.get('id')
 
     @property
     def name(self):
-        """Name"""
+        """Name."""
         return self._data.get('name')
 
     @property
     def note(self):
-        """Note"""
+        """Note."""
         return self._data.get('note')
 
     @property
     def on_budget(self):
-        """On budget"""
+        """On budget."""
         return self._data.get('on_budget')
 
     @property
     def transfer_payee_id(self):
-        """Transfer payee ID"""
+        """Transfer payee ID."""
         return self._data.get('transfer_payee_id')
 
     @property
     def type(self):
-        """Type"""
+        """Type."""
         return self._data.get('type')

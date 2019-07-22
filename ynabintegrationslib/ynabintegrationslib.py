@@ -24,7 +24,7 @@
 #
 
 """
-Main code for ynabintegrationslib
+Main code for ynabintegrationslib.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -56,20 +56,20 @@ TRANSACTIONS_QUEUE_SIZE = 100
 
 
 class Service:
-    """Models a service to retrieve transactions and upload them to YNAB"""
+    """Models a service to retrieve transactions and upload them to YNAB."""
 
     def __init__(self):
         self._accounts = []
         self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
 
     def register_account(self, account):
-        """Registers an account on the service
+        """Registers an account on the service.
 
         Args:
-            account (Account): The bank account to register
+            account (Account): The bank account to register.
 
         Returns:
-            boolean (bool): True on success, False otherwise
+            boolean (bool): True on success, False otherwise.
 
         """
         if not isinstance(account, YnabAccount):
@@ -78,10 +78,10 @@ class Service:
             self._accounts.append(account)
 
     def get_latest_transactions(self):
-        """Retrieves the latest transactions from all accounts
+        """Retrieves the latest transactions from all accounts.
 
         Returns:
-            transactions (Transaction): A list of transactions to upload to YNAB
+            transactions (Transaction): A list of transactions to upload to YNAB.
 
         """
         transactions = []
