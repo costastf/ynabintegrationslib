@@ -34,8 +34,9 @@ Main code for core.
 import abc
 import logging
 
-from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 from abnamrolib.lib.core import Comparable
+
+from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -47,7 +48,6 @@ __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
-
 # This is the main prefix used for logging
 LOGGER_BASENAME = '''core'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
@@ -58,6 +58,7 @@ class YnabAccount(Comparable):
     """Models a YNAB account."""
 
     def __init__(self, bank_account, ynab_service, budget_name, ynab_account_name):
+        super().__init__(bank_account._data)  # pylint: disable=protected-access
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self.bank_account = bank_account
         self.ynab = ynab_service
@@ -82,9 +83,6 @@ class YnabAccount(Comparable):
         """Ynab account."""
         return self._ynab_account
 
-    def __hash__(self):
-        return hash(self.bank_account)
-
     @abc.abstractmethod
     def transactions(self):
         """Transactions."""
@@ -100,6 +98,7 @@ class YnabTransaction(Comparable):
     """Models the interface for ynab transaction."""
 
     def __init__(self, transaction, account):
+        super().__init__(transaction._data)  # pylint: disable=protected-access
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self._transaction = transaction
         self.account = account

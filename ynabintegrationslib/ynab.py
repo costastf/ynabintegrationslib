@@ -126,15 +126,16 @@ class Ynab:
         budgets = {}
         for transaction in transactions:
             budgets.setdefault(transaction.account.budget.id, []).append(transaction.payload)
-        results = []
-        for budget_id, payloads in budgets.items():
-            transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
-            response = self._session.post(transaction_url, json={"transactions": payloads})
-            results.append(response.ok)
-            if not response.ok:
-                self._logger.error('Unsuccessful attempt to upload to budget "%s", response was %s', budget_id,
-                                                                                                     response.text)
-        return all(results)
+        return all([self._upload_payloads(budget_id, payloads)
+                    for budget_id, payloads in budgets.items()])
+
+    def _upload_payloads(self, budget_id, payloads):
+        transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
+        response = self._session.post(transaction_url, json={"transactions": payloads})
+        if not response.ok:
+            self._logger.error('Unsuccessful attempt to upload to budget "%s", response was %s', budget_id,
+                               response.text)
+        return response.ok
 
 
 class Budget:
