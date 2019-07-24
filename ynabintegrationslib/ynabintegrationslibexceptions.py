@@ -44,3 +44,6 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 class InvalidBudget(Exception):
     """The budget does not exist on YNAB."""
+
+class InvalidAccount(Exception):
+    """The account does not exist on YNAB."""

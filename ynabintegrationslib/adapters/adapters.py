@@ -34,6 +34,8 @@ Main code for adapters.
 import abc
 import logging
 
+from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
+
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
 __date__ = '''24-06-2019'''
@@ -163,12 +165,20 @@ class AbnAmroCreditCardTransaction(YnabTransaction):
 class YnabAccount(abc.ABC):
     """Models a YNAB account."""
 
-    def __init__(self, account, ynab_service, budget_name, account_name):
+    def __init__(self, bank_account, ynab_service, budget_name, ynab_account_name):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self.bank_account = account
+        self.bank_account = bank_account
         self.ynab = ynab_service
-        self._budget = self.ynab.get_budget_by_name(budget_name)
-        self._ynab_account = self.budget.get_account_by_name(account_name)
+        self._budget, self._ynab_account = self._get_budget_and_account(budget_name, ynab_account_name)
+
+    def _get_budget_and_account(self, budget_name, account_name):
+        budget = self.ynab.get_budget_by_name(budget_name)
+        if not budget:
+            raise InvalidBudget(budget_name)
+        account = budget.get_account_by_name(account_name)
+        if not account:
+            raise InvalidAccount(account_name)
+        return budget, account
 
     @property
     def budget(self):
