@@ -119,16 +119,22 @@ class Ynab:
             boolean (bool): True on success, False otherwise
 
         """
-        transaction_url = f'{self.api_url}/budgets/{account.budget.id}/transactions'
+        if not transactions:
+            return True
         if not isinstance(transactions, (list, tuple, set)):
             transactions = [transactions]
-        payloads = [transaction.payload for transaction in transactions]
-        if not payloads:
-            return True
-        response = self._session.post(transaction_url, json={"transactions": payloads})
-        if not response.ok:
-            self._logger.error('Unsuccessful attempt to upload, response was %s', response.text)
-        return response.ok
+        budgets = {}
+        for transaction in transactions:
+            budgets.setdefault(transaction.account.budget.id, []).append(transaction.payload)
+        results = []
+        for budget_id, payloads in budgets.items():
+            transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
+            response = self._session.post(transaction_url, json={"transactions": payloads})
+            results.append(response.ok)
+            if not response.ok:
+                self._logger.error('Unsuccessful attempt to upload to budget "%s", response was %s', budget_id,
+                                                                                                     response.text)
+        return all(results)
 
 
 class Budget:
