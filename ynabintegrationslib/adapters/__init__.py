@@ -32,12 +32,12 @@ Import all parts from adapters here
    http://google.github.io/styleguide/pyguide.html
 """
 
-from .adapters import (AbnAmroCreditCardAccount,
-                       AbnAmroAccountTransaction,
-                       AbnAmroAccount,
-                       AbnAmroCreditCardTransaction,
-                       YnabAccount,
-                       YnabTransaction)
+from .abnamro import (AbnAmroCreditCardAccount,
+                      AbnAmroAccountTransaction,
+                      AbnAmroAccount,
+                      AbnAmroCreditCardTransaction,
+                      YnabAccount,
+                      YnabTransaction)
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
