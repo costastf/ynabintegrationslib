@@ -61,7 +61,7 @@ class Ynab:
         self._api_version = 'v1'
         self._base_url = url
         self.api_url = f'{self._base_url}/{self._api_version}'
-        self._session = self._get_authenticated_session(token)
+        self.session = self._get_authenticated_session(token)
 
     def _get_authenticated_session(self, token):
         budget_url = f'{self.api_url}/budgets'
@@ -76,7 +76,7 @@ class Ynab:
     def budgets(self):
         """Retrieves the budgets."""
         budget_url = f'{self.api_url}/budgets'
-        response = self._session.get(budget_url)
+        response = self.session.get(budget_url)
         response.raise_for_status()
         return [Budget(self, budget)
                 for budget in response.json().get('data', {}).get('budgets', [])]
@@ -131,7 +131,7 @@ class Ynab:
 
     def _upload_payloads(self, budget_id, payloads):
         transaction_url = f'{self.api_url}/budgets/{budget_id}/transactions'
-        response = self._session.post(transaction_url, json={"transactions": payloads})
+        response = self.session.post(transaction_url, json={"transactions": payloads})
         if not response.ok:
             self._logger.error('Unsuccessful attempt to upload to budget "%s", response was %s', budget_id,
                                response.text)
@@ -149,7 +149,7 @@ class Budget:
     def accounts(self):
         """Accounts of the budget."""
         url = f'{self._ynab.api_url}/budgets/{self.id}/accounts'
-        response = self._ynab._session.get(url)  # pylint: disable=protected-access
+        response = self._ynab.session.get(url)
         response.raise_for_status()
         return [Account(account, self)
                 for account in response.json().get('data', {}).get('accounts', [])]
