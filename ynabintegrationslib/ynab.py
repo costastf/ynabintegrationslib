@@ -108,7 +108,7 @@ class Ynab:
             raise InvalidBudget(budget_name)
         return budget.accounts
 
-    def upload_transactions(self, transactions, account):
+    def upload_transactions(self, transactions):
         """Uploads the provided transaction objects to YNAB.
 
         Args:

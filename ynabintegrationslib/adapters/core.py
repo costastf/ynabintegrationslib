@@ -35,7 +35,7 @@ import abc
 import logging
 
 from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
-from abnamrolib.abnamrolib.core import Comparable
+from abnamrolib.lib.core import Comparable
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -102,7 +102,7 @@ class YnabTransaction(Comparable):
     def __init__(self, transaction, account):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self._transaction = transaction
-        self._account = account
+        self.account = account
 
     def __hash__(self):
         return hash(self._transaction)
@@ -134,7 +134,7 @@ class YnabTransaction(Comparable):
     @property
     def payload(self):
         """Payload."""
-        return {'account_id': self._account.id,
+        return {'account_id': self.account.id,
                 'amount': self.amount,
                 'payee_name': self.payee_name,
                 'memo': self.memo,
