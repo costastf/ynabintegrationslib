@@ -128,7 +128,8 @@ class YnabTransaction(Comparable):
 
     @staticmethod
     def _clean_up(string):
-        return " ".join(string.split())
+        if string:
+            return " ".join(string.split())
 
     @property
     def payload(self):
