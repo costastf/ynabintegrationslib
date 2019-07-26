@@ -35,6 +35,7 @@ import abc
 import logging
 
 from abnamrolib.lib.core import Comparable
+from abnamrolib import CreditCardContract, AccountContract
 
 from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 
@@ -52,6 +53,26 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 LOGGER_BASENAME = '''core'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
+
+
+class YnabContract:
+
+    def __init__(self, name, bank, contract_type, credentials):
+        self.name = name
+        self.bank = bank
+        self.type = contract_type
+        self._contract = self._get_contract(credentials)
+
+    def get_account_by_id(self, id_):
+        if self.type == 'Account':
+            return self._contract.get_account_by_iban(id_)
+        elif self.type == 'CreditCard':
+            return self._contract.get_account_by_number(id_) if id_ else self._contract.get_default_account()
+
+    def _get_contract(self, credentials):
+        contract_object = getattr(__import__('.abnamro'),
+                                  f'{contract.type}Contract')  # GOFIX
+        return contract_object(**credentials)
 
 
 class YnabAccount(Comparable):
@@ -128,7 +149,7 @@ class YnabTransaction(Comparable):
 
     @staticmethod
     def _clean_up(string):
-        return " ".join(string.split())
+        return " ".join(string.split()) if string else ''
 
     @property
     def payload(self):

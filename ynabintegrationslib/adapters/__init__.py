@@ -35,9 +35,11 @@ Import all parts from adapters here
 from .abnamro import (AbnAmroCreditCardAccount,
                       AbnAmroAccountTransaction,
                       AbnAmroAccount,
-                      AbnAmroCreditCardTransaction,
-                      YnabAccount,
-                      YnabTransaction)
+                      AbnAmroCreditCardTransaction)
+from .core import (YnabContract,
+                   YnabAccount,
+                   YnabTransaction)
+
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -55,3 +57,4 @@ assert AbnAmroAccountTransaction
 assert AbnAmroCreditCardAccount
 assert YnabTransaction
 assert YnabAccount
+assert YnabContract
