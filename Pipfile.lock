@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "860f2833641c236220210f7ece9016aaf89ad834d84cc44b86ff36eaaafc15e0"
+            "sha256": "67e98149e02f83ff503743cca85c21707db47a2f3faecc02ff0d5773676c0ec4"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -16,10 +16,10 @@
     "default": {
         "abnamrolib": {
             "hashes": [
-                "sha256:d5b00bdf08fef45d9c147c5a0a82ba280178941e8cf95db7652b7033d19f05b0"
+                "sha256:f31b3e1236cc06a6f8f2cddb8fea84cc68e8d2502962fa4fb53e5ca4b3de6753"
             ],
             "index": "pypi",
-            "version": "==1.0.2"
+            "version": "==2.0.0"
         },
         "certifi": {
             "hashes": [
@@ -617,10 +617,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:5fe3719f0185cc6d4e7ebb2d3b73bfadbebaaf0afa73fb312ec8b193ef8335b3",
-                "sha256:d0158c9784570aab78cbb1e4dc59938de128d38e20e5271d9997ada4b417012c"
+                "sha256:6cb2e4c18d22dbbe283d0a0c31bb7d90771a606b2cb3415323eea008eaee6a9d",
+                "sha256:909fe0d3f7c9151b2df0a2cb53e55bdb7b0d61469353ff7a49fd47b0f0ab9285"
             ],
-            "version": "==16.7.1"
+            "version": "==16.7.2"
         },
         "webencodings": {
             "hashes": [
