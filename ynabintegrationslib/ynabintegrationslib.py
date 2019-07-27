@@ -122,7 +122,7 @@ class Service:
             for transaction in account.get_latest_transactions():
                 if transaction not in self._transactions:
                     transactions.append(transaction)
-        self._logger.debug('Caching %n transactions', len(transactions))
+        self._logger.debug('Caching %s transactions', len(transactions))
         self._transactions.extend(transactions)
         if first_run:
             self._logger.info('First run detected, discarding transactions until now')
