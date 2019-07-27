@@ -48,4 +48,3 @@ CONFIGURATION = {'ynab_token': 'TOKEN',
                                'budget_name': 'BUDGET_NAME',
                                'account_name': 'ACCOUNT_NAME'}
                               ]}
-

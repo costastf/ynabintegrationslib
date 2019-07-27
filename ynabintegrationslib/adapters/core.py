@@ -70,8 +70,8 @@ class YnabContract:
             return self._contract.get_account_by_number(id_) if id_ else self._contract.get_default_account()
 
     def _get_contract(self, credentials):
-        contract_object = getattr(__import__('.abnamro'),
-                                  f'{contract.type}Contract')  # GOFIX
+        contract_object = getattr(__import__('abnamrolib'),
+                                  f'{self.type}Contract')
         return contract_object(**credentials)
 
 

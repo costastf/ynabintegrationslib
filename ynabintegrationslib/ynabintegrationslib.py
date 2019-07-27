@@ -34,13 +34,14 @@ Main code for ynabintegrationslib.
 import logging
 
 from collections import deque
+from abnamrolib import (AccountContract,
+                        CreditCardContract)
+from ynabintegrationslib import Ynab
 from .adapters import (YnabContract,
                        YnabAccount,
                        AbnAmroAccount,
                        AbnAmroCreditCardAccount)
-from abnamrolib import (AccountContract,
-                        CreditCardContract)
-from ynabintegrationslib import Ynab
+
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -148,8 +149,8 @@ class Service:
         if not contract:
             self._logger.error('Could not get contract by name "%s"', contract_name)
             return False
-        account_object = getattr(__import__('ynabintegrationslib.adapters.abnamro'),
-                                 f'{contract.bank}{contract.type}') # GOFIX
+        account_object = getattr(__import__('ynabintegrationslib.adapters.abnamro', fromlist='adapters'),
+                                 f'{contract.bank}{contract.type}')
         account = contract.get_account_by_id(account_id)
         self._accounts.append(account_object(account,
                                              self._ynab,
