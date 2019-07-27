@@ -33,7 +33,12 @@ Main code for abnamro.
 
 import logging
 
-from .core import YnabAccount, YnabTransaction
+from ynabintegrationslib.lib.core import YnabAccount, YnabTransaction
+from abnamrolib import AccountContract as AbnAmroAccountContract
+from abnamrolib import CreditCardContract as AbnAmroCreditCardContract
+
+assert AbnAmroAccountContract
+assert AbnAmroCreditCardContract
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -67,7 +72,7 @@ class AbnAmroAccount(YnabAccount):
             yield AbnAmroAccountTransaction(transaction, self._ynab_account)
 
 
-class AbnAmroCreditCardAccount(YnabAccount):
+class AbnAmroCreditCard(YnabAccount):
     """Models an Abn Amro credit card account."""
 
     @property

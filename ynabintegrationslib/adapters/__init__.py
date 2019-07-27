@@ -32,14 +32,12 @@ Import all parts from adapters here
    http://google.github.io/styleguide/pyguide.html
 """
 
-from .abnamro import (AbnAmroCreditCardAccount,
-                      AbnAmroAccountTransaction,
-                      AbnAmroAccount,
-                      AbnAmroCreditCardTransaction)
-from .core import (YnabContract,
-                   YnabAccount,
-                   YnabTransaction)
-
+from ynabintegrationslib.adapters.abnamro import (AbnAmroCreditCard,
+                                                  AbnAmroCreditCardTransaction,
+                                                  AbnAmroAccount,
+                                                  AbnAmroAccountTransaction,
+                                                  AbnAmroAccountContract,
+                                                  AbnAmroCreditCardContract)
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -51,10 +49,9 @@ __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 # This is to 'use' the module(s), so lint doesn't complain
-assert AbnAmroCreditCardTransaction
 assert AbnAmroAccount
 assert AbnAmroAccountTransaction
-assert AbnAmroCreditCardAccount
-assert YnabTransaction
-assert YnabAccount
-assert YnabContract
+assert AbnAmroCreditCard
+assert AbnAmroCreditCardTransaction
+assert AbnAmroAccountContract
+assert AbnAmroCreditCardContract

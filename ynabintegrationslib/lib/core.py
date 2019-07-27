@@ -33,9 +33,9 @@ Main code for core.
 
 import abc
 import logging
+import importlib
 
-from abnamrolib.lib.core import Comparable
-from abnamrolib import CreditCardContract, AccountContract
+from bankinterfaceslib import Comparable
 
 from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 
@@ -55,23 +55,19 @@ LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
 
 
-class YnabContract:
+class YnabContract:  # pylint: disable=too-few-public-methods
+    """Models a ynab contract"""
 
     def __init__(self, name, bank, contract_type, credentials):
         self.name = name
         self.bank = bank
         self.type = contract_type
-        self._contract = self._get_contract(credentials)
+        self.contract = self._get_contract(bank, contract_type, credentials)
 
-    def get_account_by_id(self, id_):
-        if self.type == 'Account':
-            return self._contract.get_account_by_iban(id_)
-        elif self.type == 'CreditCard':
-            return self._contract.get_account_by_number(id_) if id_ else self._contract.get_default_account()
-
-    def _get_contract(self, credentials):
-        contract_object = getattr(__import__('.abnamro'),
-                                  f'{contract.type}Contract')  # GOFIX
+    @staticmethod
+    def _get_contract(bank, type_, credentials):
+        contract_object = getattr(importlib.import_module('ynabintegrationslib.adapters'),
+                                  f'{bank}{type_}Contract')
         return contract_object(**credentials)
 
 

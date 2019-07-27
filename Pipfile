@@ -33,8 +33,6 @@ emoji = "~=0.5.1"
 
 [packages]
 
-requests = "*"
-selenium = "*"
-coloredlogs = "*"
-webdriver-manager = "*"
-abnamrolib = "~=2.0.0"
+requests = "~=2.22.0"
+abnamrolib = "~=3.0.0"
+ynablib = "~=0.1.0"
