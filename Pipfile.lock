@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "9ec72610f17c362f5a6732df54e6e9580b6464fb47d646c0c8a3c0569ecf0c93"
+            "sha256": "250ba664e3272f453392d4a50add52b1bfaf0031768106b243a5d433c078e2aa"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -16,16 +16,23 @@
     "default": {
         "abnamrolib": {
             "hashes": [
-                "sha256:f4822c6f07a0cc7fa309c874aee5bed72386b7e8c342036c39ea8bbc9d885f92"
+                "sha256:dc4bf685e4376e675ad1d442435d08a4cc9e7cb73adb0c050a54c5aa5cd3817b"
             ],
             "index": "pypi",
-            "version": "==3.0.2"
+            "version": "==3.0.8"
+        },
+        "backoff": {
+            "hashes": [
+                "sha256:c7187f15339e775aec926dc6e5e42f8a3ad7d3c2b9a6ecae7b535000f70cd838",
+                "sha256:d340bb6f36d025c04214b8925112d8456970e5f28dda46e4f1133bf5c622cb0a"
+            ],
+            "version": "==1.8.0"
         },
         "bankinterfaceslib": {
             "hashes": [
-                "sha256:206cc8c69b93285ea92af54af59ed386e006a46422eb98f18d05dd7f4f8e605d"
+                "sha256:f81a0b7f622db47b556743aee36db9bc5dc5bc02bbacfe99a9b71cda7e9f0a51"
             ],
-            "version": "==0.2.0"
+            "version": "==0.2.1"
         },
         "certifi": {
             "hashes": [
