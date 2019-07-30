@@ -35,4 +35,4 @@ emoji = "~=0.5.1"
 
 requests = "~=2.22.0"
 abnamrolib = "~=3.0.9"
-ynablib = "~=0.1.1"
+ynablib = "~=0.1.2"
