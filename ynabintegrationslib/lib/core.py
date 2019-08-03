@@ -83,7 +83,8 @@ class YnabAccount(Comparable):
 
     @property
     def _comparable_attributes(self):
-        return self.bank_account._comparable_attributes  # pylint: disable=protected-access
+        return ['budget',
+                'ynab_account']
 
     def _get_budget_and_account(self, budget_name, account_name):
         budget = self.ynab.get_budget_by_name(budget_name)
