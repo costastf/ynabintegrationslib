@@ -126,7 +126,7 @@ class YnabTransaction(Comparable):
 
     @property
     def _comparable_attributes(self):
-        return self._transaction._comparable_attributes  # pylint: disable=protected-access
+        return ['payload']
 
     @abc.abstractmethod
     def amount(self):

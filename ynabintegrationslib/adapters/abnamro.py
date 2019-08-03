@@ -62,6 +62,19 @@ class AbnAmroAccount(YnabAccount):
     """Models an Abn Amro account."""
 
     @property
+    def _comparable_attributes(self):
+        return ['ynab_account_name',
+                'bank_account_number']
+
+    @property
+    def ynab_account_name(self):
+        return self.ynab_account.name
+
+    @property
+    def bank_account_number(self):
+        return self.bank_account.account_number
+
+    @property
     def transactions(self):
         """Transactions."""
         for transaction in self.bank_account.transactions:
@@ -75,6 +88,19 @@ class AbnAmroAccount(YnabAccount):
 
 class AbnAmroCreditCard(YnabAccount):
     """Models an Abn Amro credit card account."""
+
+    @property
+    def _comparable_attributes(self):
+        return ['ynab_account_name',
+                'bank_account_number']
+
+    @property
+    def ynab_account_name(self):
+        return self.ynab_account.name
+
+    @property
+    def bank_account_number(self):
+        return self.bank_account.number
 
     @property
     def transactions(self):
@@ -94,7 +120,7 @@ class AbnAmroAccountTransaction(YnabTransaction):
     @property
     def amount(self):
         """Amount."""
-        return int(float(self._transaction.amount) * 1000)
+        return int(float(self._transaction.amount) * 1000) if self._transaction.amount else None
 
     @property
     def payee_name(self):
