@@ -24,7 +24,7 @@
 #
 
 """
-Main code for core
+Main code for core.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -33,13 +33,11 @@ Main code for core
 
 import abc
 import logging
+import importlib
 
-from requests import Session
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
+from bankinterfaceslib import Comparable
+
+from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -51,134 +49,114 @@ __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
-
 # This is the main prefix used for logging
 LOGGER_BASENAME = '''core'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
 LOGGER.addHandler(logging.NullHandler())
 
 
-PAGE_TRANSITION_WAIT = 120
+class YnabContract:  # pylint: disable=too-few-public-methods
+    """Models a ynab contract."""
+
+    def __init__(self, name, bank, contract_type, credentials):
+        self.name = name
+        self.bank = bank
+        self.type = contract_type
+        self.contract = self._get_contract(bank, contract_type, credentials)
+
+    @staticmethod
+    def _get_contract(bank, type_, credentials):
+        contract_object = getattr(importlib.import_module('ynabintegrationslib.adapters'),
+                                  f'{bank}{type_}Contract')
+        return contract_object(**credentials)
 
 
-class AccountAuthenticator(abc.ABC):
+class YnabAccount(Comparable):
+    """Models a YNAB account."""
 
-    def __init__(self):
+    def __init__(self, bank_account, ynab_service, budget_name, ynab_account_name):
+        super().__init__(bank_account._data)  # pylint: disable=protected-access
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self._driver = self._initialize_chrome()
+        self.bank_account = bank_account
+        self.ynab = ynab_service
+        self._budget, self._ynab_account = self._get_budget_and_account(budget_name, ynab_account_name)
 
-    def _initialize_chrome(self):
-        self._logger.info('Initializing chrome in headless mode')
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('window-size=1920,1080')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--no-sandbox')
-        driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(),
-                                  chrome_options=chrome_options)
-        driver.implicitly_wait(PAGE_TRANSITION_WAIT)
-        return driver
+    @property
+    def _comparable_attributes(self):
+        return self.bank_account._comparable_attributes  # pylint: disable=protected-access
 
-    def _click_on(self, xpath):
-        self._logger.info('Waiting for %s', xpath)
-        WebDriverWait(self._driver,
-                      PAGE_TRANSITION_WAIT).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-        self._logger.info('Clicking %s', xpath)
-        self._driver.find_element_by_xpath(xpath).click()
+    def _get_budget_and_account(self, budget_name, account_name):
+        budget = self.ynab.get_budget_by_name(budget_name)
+        if not budget:
+            raise InvalidBudget(budget_name)
+        account = budget.get_account_by_name(account_name)
+        if not account:
+            raise InvalidAccount(account_name)
+        return budget, account
+
+    @property
+    def budget(self):
+        """Budget."""
+        return self._budget
+
+    @property
+    def ynab_account(self):
+        """Ynab account."""
+        return self._ynab_account
 
     @abc.abstractmethod
-    def authenticate(self, *args, **kwargs):
+    def transactions(self):
+        """Transactions."""
         pass
 
-    def get_authenticated_session(self):
-        self._logger.info('Log in successful, getting session cookies.')
-        session = Session()
-        self._logger.info('Transferring cookies to a requests session.')
-        for cookie in self._driver.get_cookies():
-            for invalid in ['httpOnly', 'expiry']:
-                try:
-                    del cookie[invalid]
-                except KeyError:
-                    pass
-            session.cookies.set(**cookie)
-        self.quit()
-        return session
-
-    def quit(self):
-        self._logger.info('Closing chrome')
-        self._driver.quit()
+    @abc.abstractmethod
+    def get_latest_transactions(self):
+        """Retrieves latest transactions from account."""
+        pass
 
 
-class YnabTransaction(abc.ABC):
+class YnabTransaction(Comparable):
+    """Models the interface for ynab transaction."""
 
-    def __init__(self, data):
+    def __init__(self, transaction, account):
+        super().__init__(transaction._data)  # pylint: disable=protected-access
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self._data = data
+        self._transaction = transaction
+        self.account = account
+
+    @property
+    def _comparable_attributes(self):
+        return self._transaction._comparable_attributes  # pylint: disable=protected-access
 
     @abc.abstractmethod
     def amount(self):
+        """Amount."""
         pass
 
     @abc.abstractmethod
     def payee_name(self):
+        """Payee Name."""
         pass
 
     @abc.abstractmethod
     def memo(self):
+        """Memo."""
         pass
 
     @abc.abstractmethod
     def date(self):
+        """Date."""
         pass
-
-    def __hash__(self):
-        return hash(str(self._data))
-
-    def __eq__(self, other):
-        """Override the default Equals behavior"""
-        if not isinstance(other, self.__class__):
-            raise ValueError('Not a YnabTransaction object')
-        return hash(self) == hash(other)
-
-    def __ne__(self, other):
-        """Override the default Unequal behavior"""
-        if not isinstance(other, self.__class__):
-            raise ValueError('Not a YnabTransaction object')
-        return hash(self) != hash(other)
 
     @staticmethod
     def _clean_up(string):
-        return " ".join(string.split())
+        return " ".join(string.split()) if string else ''
 
     @property
-    def to_ynab(self):
-        return {'amount': self.amount,
+    def payload(self):
+        """Payload."""
+        return {'account_id': self.account.id,
+                'amount': self.amount,
                 'payee_name': self.payee_name,
                 'memo': self.memo,
                 'date': self.date}
-
-
-class Account(abc.ABC):
-
-    @abc.abstractmethod
-    def transactions(self):
-        pass
-
-    @abc.abstractmethod
-    def get_current_transactions(self):
-        pass
-
-    def __hash__(self):
-        return hash(str(self.__dict__))
-
-    def __eq__(self, other):
-        """Override the default Equals behavior"""
-        if not isinstance(other, self.__class__):
-            raise ValueError('Not a Account object')
-        return hash(self) == hash(other)
-
-    def __ne__(self, other):
-        """Override the default Unequal behavior"""
-        if not isinstance(other, self.__class__:
-            raise ValueError('Not a Account object')
-        return hash(self) != hash(other)
