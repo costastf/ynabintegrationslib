@@ -62,8 +62,8 @@ class Service:
 
     def __init__(self, ynab_token):
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
-        self._accounts = []
-        self._contracts = []
+        self._accounts = set()
+        self._contracts = set()
         self._ynab = Ynab(ynab_token)
         self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
 
@@ -76,6 +76,21 @@ class Service:
     def contracts(self):
         """Contracts."""
         return self._contracts
+
+    @staticmethod
+    def _to_list(transactions):
+        if not isinstance(transactions, (list, set, tuple)):
+            transactions = [transactions]
+        return transactions
+
+    def initialize_cache(self, transactions):
+        """Initializes the cache"""
+        self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
+        self._transactions.extend(self._to_list(transactions))
+
+    def add_transactions_to_cache(self, transactions):
+        """Adds transactions to cache"""
+        self._transactions.extend(self._to_list(transactions))
 
     def get_contract_by_name(self, name):
         """Retrieves a contract by name.
@@ -104,7 +119,7 @@ class Service:
 
         """
         try:
-            self._contracts.append(YnabContract(name, bank, contract_type, credentials))
+            self._contracts.add(YnabContract(name, bank, contract_type, credentials))
             return True
         except Exception:  # pylint: disable=broad-except
             self._logger.exception('Problem registering contract')
@@ -131,18 +146,18 @@ class Service:
             account_wrapper = getattr(importlib.import_module('ynabintegrationslib.adapters'),
                                       f'{ynab_contract.bank}{ynab_contract.type}')
             account = ynab_contract.contract.get_account(account_id)
-            self._accounts.append(account_wrapper(account,
-                                                  self._ynab,
-                                                  budget_name,
-                                                  ynab_account_name))
+            self._accounts.add(account_wrapper(account,
+                                               self._ynab,
+                                               budget_name,
+                                               ynab_account_name))
             return True
         except Exception:  # pylint: disable=broad-except
             self._logger.exception('Problem registering account')
             return False
 
-    @staticmethod
-    def _filter_transaction(transaction):
-        conditions = [(hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
+    def _filter_transaction(self, transaction):
+        conditions = [transaction not in self._transactions,
+                      (hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
         return all(conditions)
 
     def get_latest_transactions(self):
@@ -159,10 +174,10 @@ class Service:
         for account in self.accounts:
             self._logger.debug('Getting transactions for account "%s"', account.ynab_account.name)
             for transaction in account.get_latest_transactions():
-                if transaction not in self._transactions and not self._filter_transaction(transaction):
+                if not self._filter_transaction(transaction):
                     transactions.append(transaction)
         self._logger.debug('Caching %s transactions', len(transactions))
-        self._transactions.extend(transactions)
+        self.add_transactions_to_cache(transactions)
         if first_run:
             self._logger.info('First run detected, discarding transactions until now')
             return []
