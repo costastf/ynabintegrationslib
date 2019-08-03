@@ -120,8 +120,9 @@ class YnabTransaction(Comparable):
         self._transaction = transaction
         self.account = account
 
-    def __hash__(self):
-        return hash(self._transaction)
+    @property
+    def _comparable_attributes(self):
+        return ['payload']
 
     @abc.abstractmethod
     def amount(self):
