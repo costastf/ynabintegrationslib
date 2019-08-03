@@ -68,10 +68,12 @@ class AbnAmroAccount(YnabAccount):
 
     @property
     def ynab_account_name(self):
+        """Ynab account name."""
         return self.ynab_account.name
 
     @property
     def bank_account_number(self):
+        """Bank account number."""
         return self.bank_account.account_number
 
     @property
@@ -96,10 +98,12 @@ class AbnAmroCreditCard(YnabAccount):
 
     @property
     def ynab_account_name(self):
+        """Ynab account name."""
         return self.ynab_account.name
 
     @property
     def bank_account_number(self):
+        """Bank account number."""
         return self.bank_account.number
 
     @property
