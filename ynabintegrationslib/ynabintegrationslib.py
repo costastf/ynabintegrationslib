@@ -49,7 +49,6 @@ __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
-
 # This is the main prefix used for logging
 LOGGER_BASENAME = '''ynabintegrationslib'''
 LOGGER = logging.getLogger(LOGGER_BASENAME)
@@ -70,39 +69,74 @@ class Service:
 
     @property
     def accounts(self):
+        """Accounts."""
         return self._accounts
 
     @property
     def contracts(self):
+        """Contracts."""
         return self._contracts
 
     def get_contract_by_name(self, name):
+        """Retrieves a contract by name.
+
+        Args:
+            name: The name of the contract to retrieve
+
+        Returns:
+            contract (Contract): A contract if a match is found else None
+
+        """
         return next((contract for contract in self.contracts
                      if contract.name.lower() == name.lower()), None)
 
     def register_contract(self, name, bank, contract_type, credentials):
+        """Registers an account in the service.
+
+        Args:
+            name: The friendly name to identify the account by
+            bank: The bank of the account
+            contract_type: The type of the contract
+            credentials: A dictionary with the required credentials to initialize the contract
+
+        Returns:
+            bool (bool) : True on success, False otherwise
+
+        """
         try:
             self._contracts.append(YnabContract(name, bank, contract_type, credentials))
             return True
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._logger.exception('Problem registering contract')
             return False
 
     def register_account(self, contract_name, budget_name, ynab_account_name, account_id=None):
+        """Registers an account in the service.
+
+        Args:
+            contract_name: The friendly name of the contract the account is part of
+            budget_name: The name of the budget in YNAB the account is connected with
+            ynab_account_name: The name of the account in YNAB that the account is associated with
+            account_id: The id of the account to be identified by
+
+        Returns:
+            bool (bool) : True on success, False otherwise
+
+        """
         ynab_contract = self.get_contract_by_name(contract_name)
         if not ynab_contract:
             self._logger.error('Could not get contract by name "%s"', contract_name)
             return False
         try:
             account_wrapper = getattr(importlib.import_module('ynabintegrationslib.adapters'),
-                                     f'{ynab_contract.bank}{ynab_contract.type}')
+                                      f'{ynab_contract.bank}{ynab_contract.type}')
             account = ynab_contract.contract.get_account(account_id)
             self._accounts.append(account_wrapper(account,
-                                                 self._ynab,
-                                                 budget_name,
-                                                 ynab_account_name))
+                                                  self._ynab,
+                                                  budget_name,
+                                                  ynab_account_name))
             return True
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             self._logger.exception('Problem registering account')
             return False
 
@@ -130,6 +164,7 @@ class Service:
         return transactions
 
     def upload_latest_transactions(self):
+        """Uploads latest transactions to YNAB."""
         self.upload_transactions(self.get_latest_transactions())
 
     def upload_transactions(self, transactions):

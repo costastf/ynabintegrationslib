@@ -33,9 +33,10 @@ Main code for abnamro.
 
 import logging
 
-from ynabintegrationslib.lib.core import YnabAccount, YnabTransaction
 from abnamrolib import AccountContract as AbnAmroAccountContract
 from abnamrolib import CreditCardContract as AbnAmroCreditCardContract
+
+from ynabintegrationslib.lib.core import YnabAccount, YnabTransaction
 
 assert AbnAmroAccountContract
 assert AbnAmroCreditCardContract
