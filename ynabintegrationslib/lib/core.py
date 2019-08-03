@@ -56,7 +56,7 @@ LOGGER.addHandler(logging.NullHandler())
 
 
 class YnabContract:  # pylint: disable=too-few-public-methods
-    """Models a ynab contract"""
+    """Models a ynab contract."""
 
     def __init__(self, name, bank, contract_type, credentials):
         self.name = name
@@ -80,6 +80,10 @@ class YnabAccount(Comparable):
         self.bank_account = bank_account
         self.ynab = ynab_service
         self._budget, self._ynab_account = self._get_budget_and_account(budget_name, ynab_account_name)
+
+    @property
+    def _comparable_attributes(self):
+        return self.bank_account._comparable_attributes  # pylint: disable=protected-access
 
     def _get_budget_and_account(self, budget_name, account_name):
         budget = self.ynab.get_budget_by_name(budget_name)
@@ -120,8 +124,9 @@ class YnabTransaction(Comparable):
         self._transaction = transaction
         self.account = account
 
-    def __hash__(self):
-        return hash(self._transaction)
+    @property
+    def _comparable_attributes(self):
+        return self._transaction._comparable_attributes  # pylint: disable=protected-access
 
     @abc.abstractmethod
     def amount(self):
