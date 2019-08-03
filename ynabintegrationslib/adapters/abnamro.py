@@ -168,3 +168,8 @@ class AbnAmroCreditCardTransaction(YnabTransaction):
     def date(self):
         """Date."""
         return self._transaction.transaction_date
+
+    @property
+    def is_reserved(self):
+        """Is reserved."""
+        return self._transaction.type_of_transaction == 'A'

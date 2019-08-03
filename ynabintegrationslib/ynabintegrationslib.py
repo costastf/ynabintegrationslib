@@ -140,6 +140,11 @@ class Service:
             self._logger.exception('Problem registering account')
             return False
 
+    @staticmethod
+    def _filter_transaction(transaction):
+        conditions = [(hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
+        return all(conditions)
+
     def get_latest_transactions(self):
         """Retrieves the latest transactions from all accounts.
 
@@ -154,7 +159,7 @@ class Service:
         for account in self.accounts:
             self._logger.debug('Getting transactions for account "%s"', account.ynab_account.name)
             for transaction in account.get_latest_transactions():
-                if transaction not in self._transactions:
+                if transaction not in self._transactions and not self._filter_transaction(transaction):
                     transactions.append(transaction)
         self._logger.debug('Caching %s transactions', len(transactions))
         self._transactions.extend(transactions)
