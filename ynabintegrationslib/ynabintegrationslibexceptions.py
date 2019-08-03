@@ -24,7 +24,7 @@
 #
 
 """
-Custom exception code for ynabintegrationslib
+Custom exception code for ynabintegrationslib.
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
@@ -40,3 +40,11 @@ __license__ = '''MIT'''
 __maintainer__ = '''Costas Tyfoxylos'''
 __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
+
+
+class InvalidBudget(Exception):
+    """The budget does not exist on YNAB."""
+
+
+class InvalidAccount(Exception):
+    """The account does not exist on YNAB."""

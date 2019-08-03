@@ -24,14 +24,17 @@
 #
 
 """
-core package
+core package.
 
-Import all parts from core here
+Import all parts from adapters here
 
 .. _Google Python Style Guide:
    http://google.github.io/styleguide/pyguide.html
 """
-from .core import AccountAuthenticator, YnabTransaction
+
+from ynabintegrationslib.lib.core import (YnabContract,
+                                          YnabAccount,
+                                          YnabTransaction)
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -43,5 +46,6 @@ __email__ = '''<costas.tyf@gmail.com>'''
 __status__ = '''Development'''  # "Prototype", "Development", "Production".
 
 # This is to 'use' the module(s), so lint doesn't complain
-assert AccountAuthenticator
+assert YnabContract
+assert YnabAccount
 assert YnabTransaction

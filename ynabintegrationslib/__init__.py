@@ -24,7 +24,7 @@
 #
 
 """
-ynabintegrationslib package
+ynabintegrationslib package.
 
 Import all parts from ynabintegrationslib here
 
@@ -32,7 +32,6 @@ Import all parts from ynabintegrationslib here
    http://google.github.io/styleguide/pyguide.html
 """
 from ._version import __version__
-from .ynab import Ynab
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
