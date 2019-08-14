@@ -157,7 +157,7 @@ class Service:
 
     def _filter_transaction(self, transaction):
         conditions = [transaction not in self._transactions,
-                      (hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
+                      (hasattr(transaction, 'is_reserved') and not transaction.is_reserved)]
         return all(conditions)
 
     def get_latest_transactions(self):
@@ -170,14 +170,12 @@ class Service:
         first_run = False
         if not self._transactions:
             first_run = True
-        transactions = []
         for account in self.accounts:
             self._logger.debug('Getting transactions for account "%s"', account.ynab_account.name)
-            for transaction in account.get_latest_transactions():
-                if not self._filter_transaction(transaction):
-                    transactions.append(transaction)
-        self._logger.debug('Caching %s transactions', len(transactions))
-        self.add_transactions_to_cache(transactions)
+            transactions = [transaction for transaction in account.get_latest_transactions()
+                            if not self._filter_transaction(transaction)]
+            self._logger.debug('Caching %s transactions for account %s', len(transactions), account.ynab_account.name)
+            self.add_transactions_to_cache(transactions)
         if first_run:
             self._logger.info('First run detected, discarding transactions until now')
             return []
