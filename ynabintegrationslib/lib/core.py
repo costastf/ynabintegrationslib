@@ -35,7 +35,7 @@ import abc
 import logging
 import importlib
 
-from bankinterfaceslib import Comparable
+from ynabinterfaceslib import Comparable
 
 from ynabintegrationslib.ynabintegrationslibexceptions import InvalidAccount, InvalidBudget
 
