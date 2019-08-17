@@ -140,6 +140,17 @@ class Service:
             self._logger.exception('Problem registering account')
             return False
 
+    def _filter_transaction(self, transaction):
+        conditions = [transaction in self._transactions,
+                      (hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
+        return any(conditions)
+
+    @staticmethod
+    def _to_list(transactions):
+        if not isinstance(transactions, (list, set, tuple)):
+            transactions = [transactions]
+        return transactions
+
     def get_latest_transactions(self):
         """Retrieves the latest transactions from all accounts.
 
@@ -154,7 +165,7 @@ class Service:
         for account in self.accounts:
             self._logger.debug('Getting transactions for account "%s"', account.ynab_account.name)
             for transaction in account.get_latest_transactions():
-                if transaction not in self._transactions:
+                if not self._filter_transaction(transaction):
                     transactions.append(transaction)
         self._logger.debug('Caching %s transactions', len(transactions))
         self._transactions.extend(transactions)
@@ -180,11 +191,9 @@ class Service:
         if not transactions:
             self._logger.debug('No transactions to upload')
             return True
-        if not isinstance(transactions, (list, tuple, set)):
-            transactions = [transactions]
         budgets = {}
         self._logger.debug('Batching transactions per budget id.')
-        for transaction in transactions:
+        for transaction in self._to_list(transactions):
             budgets.setdefault(transaction.account.budget.id, []).append(transaction.payload)
         self._logger.debug('Uploading all transactions')
         return all([self._ynab.upload_transactions(budget_id, payloads)

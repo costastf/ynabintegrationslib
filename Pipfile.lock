@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a76ad5281e7ef6ceb8543f320515e9f1fe4b62eee12fcacf0631cdb4d6f2fd9d"
+            "sha256": "4597514e349f7d079dc0be7354b63d611de9a5b0b5ab15c4e2a6f9c49395fbda"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -16,10 +16,10 @@
     "default": {
         "abnamrolib": {
             "hashes": [
-                "sha256:dd803a6f00e5ecc81117e056b2bb2834e4087d0ea919a224e423dc2841ab3543"
+                "sha256:9db960472dfcc231ef93794e7ef9c394df0ad60bd6e8022ce69e645ecfc09ee4"
             ],
             "index": "pypi",
-            "version": "==3.1.1"
+            "version": "==3.2.0"
         },
         "backoff": {
             "hashes": [
@@ -100,9 +100,9 @@
         },
         "ynabinterfaceslib": {
             "hashes": [
-                "sha256:3c5f81e3a3b880680c665d8fcd6dff6826b38d572974528d736b98cd20c463f0"
+                "sha256:4fbffc41219e4bf97788bc7a97d86860d3064c309d7bfdd041d9928f8e071b6b"
             ],
-            "version": "==0.1.0"
+            "version": "==0.2.0"
         },
         "ynablib": {
             "hashes": [
@@ -554,6 +554,7 @@
                 "sha256:ae3258c5249493cebe73cb4e18253a41ed69262484bad36fdb3efcb8ad8870bb",
                 "sha256:b52bf5833ed01c7b5c5fb73a7f71b3d98d48e9b9b8764236237bdc7ecae850fc"
             ],
+            "markers": "sys_platform != 'win32'",
             "version": "==1.12.14"
         },
         "six": {
