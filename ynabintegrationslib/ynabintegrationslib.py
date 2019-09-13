@@ -37,7 +37,7 @@ from collections import deque
 
 from ynablib import Ynab
 
-from .lib import YnabContract
+from .lib import YnabContract, YnabServerTransaction
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -66,6 +66,18 @@ class Service:
         self._contracts = []
         self._ynab = Ynab(ynab_token)
         self._transactions = deque(maxlen=TRANSACTIONS_QUEUE_SIZE)
+
+    @property
+    def budgets(self):
+        return self._ynab.budgets
+
+    def get_transactions_for_budget(self, budget_name):
+        budget = next((budget for budget in self.budgets
+                       if budget.name.lower() == budget_name.lower()), None)
+        if not budget:
+            return []
+        return [YnabServerTransaction(transaction, transaction.account)
+                for transaction in budget.transactions]
 
     @property
     def accounts(self):
@@ -101,7 +113,7 @@ class Service:
 
         """
         return next((account for account in self.accounts
-                     if account.name.lower() == name.lower()), None)
+                     if account.ynab_account_name.lower() == name.lower()), None)
 
     def register_contract(self, name, bank, contract_type, credentials):
         """Registers an account in the service.

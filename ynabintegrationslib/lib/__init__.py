@@ -34,7 +34,8 @@ Import all parts from adapters here
 
 from ynabintegrationslib.lib.core import (YnabContract,
                                           YnabAccount,
-                                          YnabTransaction)
+                                          YnabTransaction,
+                                          YnabServerTransaction)
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -49,3 +50,4 @@ __status__ = '''Development'''  # "Prototype", "Development", "Production".
 assert YnabContract
 assert YnabAccount
 assert YnabTransaction
+assert YnabServerTransaction

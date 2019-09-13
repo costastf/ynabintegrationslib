@@ -161,3 +161,27 @@ class YnabTransaction(Comparable):
                 'payee_name': self.payee_name,
                 'memo': self.memo,
                 'date': self.date}
+
+
+class YnabServerTransaction(YnabTransaction):
+    """Models an ynab uploaded transaction."""
+
+    @property
+    def amount(self):
+        """Amount."""
+        return self._transaction.amount
+
+    @property
+    def payee_name(self):
+        """Payee Name."""
+        return self._transaction.payee_name
+
+    @property
+    def memo(self):
+        """Memo of maximum 200 characters."""
+        return self._transaction.memo
+
+    @property
+    def date(self):
+        """Date."""
+        return self._transaction.date
