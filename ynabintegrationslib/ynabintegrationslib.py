@@ -90,6 +90,19 @@ class Service:
         return next((contract for contract in self.contracts
                      if contract.name.lower() == name.lower()), None)
 
+    def get_account_by_name(self, name):
+        """Retrieves an account by name.
+
+        Args:
+            name: The name of the account to retrieve
+
+        Returns:
+            account (Account): An account if a match is found else None
+
+        """
+        return next((account for account in self.accounts
+                     if account.name.lower() == name.lower()), None)
+
     def register_contract(self, name, bank, contract_type, credentials):
         """Registers an account in the service.
 
