@@ -48,3 +48,7 @@ class InvalidBudget(Exception):
 
 class InvalidAccount(Exception):
     """The account does not exist on YNAB."""
+
+
+class MultipleBudgets(Exception):
+    """There are multiple budgets on YNAB."""

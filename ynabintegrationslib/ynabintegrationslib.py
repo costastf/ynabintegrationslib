@@ -33,11 +33,13 @@ Main code for ynabintegrationslib.
 
 import importlib
 import logging
+import datetime
 from collections import deque
 
 from ynablib import Ynab
 
 from .lib import YnabContract, YnabServerTransaction
+from .ynabintegrationslibexceptions import MultipleBudgets
 
 __author__ = '''Costas Tyfoxylos <costas.tyf@gmail.com>'''
 __docformat__ = '''google'''
@@ -71,9 +73,17 @@ class Service:
     def budgets(self):
         return self._ynab.budgets
 
-    def get_transactions_for_budget(self, budget_name):
-        budget = next((budget for budget in self.budgets
-                       if budget.name.lower() == budget_name.lower()), None)
+    def get_transactions_for_budget(self, budget_name=None):
+        if len(self.budgets) > 1 and budget_name is None:
+            self._logger.error('There are multiple budgets and no budget name was provided')
+            raise MultipleBudgets
+        if budget_name is None:
+            self._logger.debug('No budget name provided returning the only budget registered')
+            budget = self.budgets[0]
+        else:
+            self._logger.debug('Trying to retrieve budget with name "%s"', budget_name)
+            budget = next((budget for budget in self.budgets
+                           if budget.name.lower() == budget_name.lower()), None)
         if not budget:
             return []
         return [YnabServerTransaction(transaction, transaction.account)
@@ -114,6 +124,13 @@ class Service:
         """
         return next((account for account in self.accounts
                      if account.ynab_account_name.lower() == name.lower()), None)
+
+    def get_transactions_for_ynab_account(self, account_name):
+        account = self.get_account_by_name(account_name)
+        if not account:
+            return []
+        return [YnabServerTransaction(transaction, transaction.account)
+                for transaction in account.transactions]
 
     def register_contract(self, name, bank, contract_type, credentials):
         """Registers an account in the service.
@@ -199,9 +216,50 @@ class Service:
             return []
         return transactions
 
-    def upload_latest_transactions(self):
+    def get_all_latest_transactions(self):
+        """Retrieves the latest transactions from all accounts.
+
+        Returns:
+            transactions (Transaction): A list of transactions to upload to YNAB.
+
+        """
+        transactions = []
+        for account in self.accounts:
+            self._logger.debug('Getting transactions for account "%s"', account.ynab_account.name)
+            for transaction in account.get_latest_transactions():
+                if not self._filter_transaction(transaction):
+                    transactions.append(transaction)
+        return transactions
+
+    def upload_latest_transactions(self, budget_name=None):
         """Uploads latest transactions to YNAB."""
-        self.upload_transactions(self.get_latest_transactions())
+        self._logger.debug('Getting all latest transactions for all bank accounts')
+        bank_transactions = self.get_all_latest_transactions()
+        self._logger.debug('Getting all transactions for Ynab budget')
+        server_transactions = self.get_transactions_for_budget(budget_name)
+        self.upload_transactions(set(bank_transactions) - set(server_transactions))
+
+    def upload_all_missing_transactions(self, budget_name=None):
+        """Uploads latest transactions to YNAB."""
+        self._logger.debug('Getting all first Ynab transaction for marker date')
+        server_transactions = self.get_transactions_for_budget(budget_name)
+        first_transaction = server_transactions[0]
+        self._logger.debug('Trying to retrieve all transactions after "%s"', first_transaction.date)
+        marker_date = datetime.datetime.strptime(first_transaction.date, "%Y-%m-%d").date()
+        transactions_to_upload = set()
+        for account in self.accounts:
+            transactions = []
+            self._logger.debug('Trying to retrieve all transactions until "%s" for account "%s"',
+                               first_transaction.date,
+                               account.ynab_account.name)
+            for transaction in account.transactions:
+                transaction_date = datetime.datetime.strptime(transaction.date, "%Y-%m-%d").date()
+                if transaction_date < marker_date:
+                    break
+                transactions.append(transaction)
+            transactions_to_upload.update(set(transactions) - set(server_transactions))
+        self._logger.debug('Uploading all missing transactions to Ynab')
+        self.upload_transactions(transactions_to_upload)
 
     def upload_transactions(self, transactions):
         """Uploads the provided transaction objects to YNAB.
