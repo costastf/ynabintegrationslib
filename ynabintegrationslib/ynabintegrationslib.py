@@ -184,7 +184,8 @@ class Service:
 
     def _filter_transaction(self, transaction):
         conditions = [transaction in self._transactions,
-                      (hasattr(transaction, 'is_reserved') and transaction.is_reserved)]
+                      (hasattr(transaction, 'is_reserved') and transaction.is_reserved),
+                      transaction.date is None] # ICS Credit card creates an unusable transaction with no date like "Incasso okt 2019 betreffende uw creditcard ICS-klantnummer XXXXXXX"
         return any(conditions)
 
     @staticmethod
