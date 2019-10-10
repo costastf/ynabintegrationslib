@@ -13,3 +13,9 @@ History
 ------------------
 
 * first release of library
+
+
+0.1.1 (10-10-2019)
+------------------
+
+* Exposed objects and exceptions at the package level
