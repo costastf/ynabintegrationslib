@@ -7,3 +7,9 @@ History
 ---------------------
 
 * First code creation
+
+
+0.1.0 (10-10-2019)
+------------------
+
+* first release of library
