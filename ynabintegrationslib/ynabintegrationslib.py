@@ -71,9 +71,19 @@ class Service:
 
     @property
     def budgets(self):
+        """Budgets."""
         return self._ynab.budgets
 
     def get_transactions_for_budget(self, budget_name=None):
+        """Gets the transactions for a budget.
+
+        Args:
+            budget_name (str): The name of the budget to get the transactions for
+
+        Returns:
+            transactions (list): A list of YnabTransaction objects for the account.
+
+        """
         if len(self.budgets) > 1 and budget_name is None:
             self._logger.error('There are multiple budgets and no budget name was provided')
             raise MultipleBudgets
@@ -126,6 +136,15 @@ class Service:
                      if account.ynab_account_name.lower() == name.lower()), None)
 
     def get_transactions_for_ynab_account(self, account_name):
+        """Gets the transactions for a YNAB account.
+
+        Args:
+            account_name (str): The name of the account in YNAB to get transactions for.
+
+        Returns:
+            transactions (list): A list of YnabServerTransaction objects
+
+        """
         account = self.get_account_by_name(account_name)
         if not account:
             return []
@@ -185,7 +204,9 @@ class Service:
     def _filter_transaction(self, transaction):
         conditions = [transaction in self._transactions,
                       (hasattr(transaction, 'is_reserved') and transaction.is_reserved),
-                      transaction.date is None] # ICS Credit card creates an unusable transaction with no date like "Incasso okt 2019 betreffende uw creditcard ICS-klantnummer XXXXXXX"
+                      transaction.date is None]
+        # ICS Credit card creates an unusable transaction with no date like
+        # "Incasso okt 2019 betreffende uw creditcard ICS-klantnummer XXXXXXX"
         return any(conditions)
 
     @staticmethod
