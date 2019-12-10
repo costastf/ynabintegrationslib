@@ -87,6 +87,21 @@ class AbnAmroAccount(YnabAccount):
         for transaction in self.bank_account.get_latest_transactions():
             yield AbnAmroAccountTransaction(transaction, self._ynab_account)
 
+    def get_transactions_for_date(self, date):
+        """Retrieves transactions for date."""
+        for transaction in self.bank_account.get_transactions_for_date(date):
+            yield AbnAmroAccountTransaction(transaction, self._ynab_account)
+
+    def get_transactions_for_date_range(self, date_from, date_to):
+        """Retrieves transactions for date."""
+        for transaction in self.bank_account.get_transactions_for_date_range(date_from, date_to):
+            yield AbnAmroAccountTransaction(transaction, self._ynab_account)
+
+    def get_transactions_since_date(self, date):
+        """Retrieves transactions for date."""
+        for transaction in self.bank_account.transactions_since_date(date):
+            yield AbnAmroAccountTransaction(transaction, self._ynab_account)
+
 
 class AbnAmroCreditCard(YnabAccount):
     """Models an Abn Amro credit card account."""
