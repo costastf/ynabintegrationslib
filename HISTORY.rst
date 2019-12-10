@@ -25,3 +25,9 @@ History
 ------------------
 
 * Bumped dependency and commented for linting.
+
+
+0.1.3 (10-12-2019)
+------------------
+
+* Bumped dependency.
