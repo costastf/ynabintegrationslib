@@ -31,3 +31,9 @@ History
 ------------------
 
 * Bumped dependency.
+
+
+0.1.4 (26-10-2020)
+------------------
+
+* Fixed a bug with a new header cookie introduced by ICS.
