@@ -7,6 +7,6 @@
 #
 # Please use Pipfile to update the requirements.
 #
-abnamrolib~=5.2.0
+abnamrolib~=5.2.1
 requests~=2.22.0
 ynablib~=0.2.0
