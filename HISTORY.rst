@@ -37,3 +37,9 @@ History
 ------------------
 
 * Fixed a bug with a new header cookie introduced by ICS.
+
+
+0.2.0 (06-07-2021)
+------------------
+
+* Made comparison on ynab transactions a little more loose.
