@@ -1,6 +1,10 @@
 [FORMAT]
 max-line-length=121
-disable=locally-disabled, locally-enabled, logging-format-interpolation
+disable=locally-disabled,
+        locally-enabled,
+        logging-format-interpolation,
+        invalid-overridden-method,
+        logging-fstring-interpolation
 
 [General]
 init-hook='import sys; sys.path.append("ynabintegrationslib")'

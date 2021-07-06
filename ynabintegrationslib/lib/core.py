@@ -75,7 +75,7 @@ class YnabAccount(Comparable):
     """Models a YNAB account."""
 
     def __init__(self, bank_account, ynab_service, budget_name, ynab_account_name):
-        super().__init__(bank_account._data)  # pylint: disable=protected-access
+        super().__init__(bank_account._data)
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self.bank_account = bank_account
         self.ynab = ynab_service
@@ -108,46 +108,48 @@ class YnabAccount(Comparable):
     @abc.abstractmethod
     def transactions(self):
         """Transactions."""
-        pass
 
     @abc.abstractmethod
     def get_latest_transactions(self):
         """Retrieves latest transactions from account."""
-        pass
 
 
 class YnabTransaction(Comparable):
     """Models the interface for ynab transaction."""
 
     def __init__(self, transaction, account):
-        super().__init__(transaction._data)  # pylint: disable=protected-access
+        super().__init__(transaction._data)
         self._logger = logging.getLogger(f'{LOGGER_BASENAME}.{self.__class__.__name__}')
         self._transaction = transaction
         self.account = account
 
     @property
     def _comparable_attributes(self):
-        return ['payload']
+        return ['account_id',
+                'amount',
+                'memo',
+                'date']
+
+    @property
+    def account_id(self):
+        """Account ID."""
+        return self.account.id
 
     @abc.abstractmethod
     def amount(self):
         """Amount."""
-        pass
 
     @abc.abstractmethod
     def payee_name(self):
         """Payee Name."""
-        pass
 
     @abc.abstractmethod
     def memo(self):
         """Memo."""
-        pass
 
     @abc.abstractmethod
     def date(self):
         """Date."""
-        pass
 
     @staticmethod
     def _clean_up(string):
