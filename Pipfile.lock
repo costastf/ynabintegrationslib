@@ -16,11 +16,11 @@
     "default": {
         "abnamrolib": {
             "hashes": [
-                "sha256:6b8c62ffdb22370a1d2e8ceef548bac1d5ded6cb8bcd2eaafd1a9963723f4e65",
-                "sha256:90fce67f104b40aae1a9af8290e5ca066f8e514ba51ef72e647c75098044a75a"
+                "sha256:8a3ead23e57ee839e27971b5884803e8ffcbe1fb71f20e92c7c0ed78da8f08c6",
+                "sha256:ef1dc4474829c537348f0a85ae36ffd7da47abdb3c0e77833c732efdfd6638f8"
             ],
             "index": "pypi",
-            "version": "==5.3.0"
+            "version": "==5.3.2"
         },
         "certifi": {
             "hashes": [
@@ -79,18 +79,18 @@
         },
         "ynabinterfaceslib": {
             "hashes": [
-                "sha256:b2ab068f56a164324bb83dd669c577a1ec4d469b81df10e5425dec251c02c5d2",
-                "sha256:b76ae583f3a9e4b706c772db18bbdb5f693a4d34cfe30dee619b8fb1427b92e1"
+                "sha256:bc362e77309a1e4b55d93dbb41ab332955c9045ebad32f24f371b9619bc0b378",
+                "sha256:cfef45d2d2008950fc7750459def0b54f2a9a3bf8c3f95d8bf02f74712e72f31"
             ],
-            "version": "==1.0.3"
+            "version": "==1.0.4"
         },
         "ynablib": {
             "hashes": [
-                "sha256:5dd74d083c2d70c3d94e9731bc1fcc591ceea04214a8ace8dcab484ec83fc576",
-                "sha256:650212d2526eac9bf8e0a5e829511f760ca95c3d6d97255b4103f05e4284bcae"
+                "sha256:019ef82b6a139a419db64ff0c268cb80839141d2aed74e63dabbb1b795839d8a",
+                "sha256:abce3a064bdd960ee6e45fbe40e7fa9f0b31143d82f61987b25d9c23baf8fcf5"
             ],
             "index": "pypi",
-            "version": "==0.2.1"
+            "version": "==0.2.2"
         }
     },
     "develop": {
@@ -262,11 +262,11 @@
         },
         "gitwrapperlib": {
             "hashes": [
-                "sha256:bdc5d97bcdc50b6e9ae5b14d4e3dcd99bb65e84a28f7ad86b2d9ad3e597236d3",
-                "sha256:f083cb1eeb59166b679639324c98ad260d82cf94200467d986e38b68ed7b5527"
+                "sha256:05145e66b8995b07455b5e7653ef946d0d2045656d68358d660eb247697444a0",
+                "sha256:9566268e34b082eeb68678b6eeed30125279f2612bdc591b1facdb254335f891"
             ],
             "index": "pypi",
-            "version": "==0.9.3"
+            "version": "==0.9.4"
         },
         "humanfriendly": {
             "hashes": [
